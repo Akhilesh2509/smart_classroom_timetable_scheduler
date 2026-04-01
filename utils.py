@@ -1,4 +1,4 @@
-import hashlib
+from werkzeug.security import generate_password_hash
 import random
 import string
 from datetime import datetime, timedelta, timezone
@@ -9,7 +9,7 @@ from models import AppConfig, ActivityLog, SystemMetric
 
 
 def hash_password(password):
-    return hashlib.sha256(password.encode()).hexdigest()
+    return generate_password_hash(password)
 
 def generate_random_password(length=8):
     characters = string.ascii_letters + string.digits

@@ -41,8 +41,11 @@ def clear_database():
         
         # Delete teacher-course associations first
         from sqlalchemy import text
-        db.session.execute(text("DELETE FROM teacher_college_courses"))
-        db.session.execute(text("DELETE FROM teacher_school_subjects"))
+        try:
+            db.session.execute(text("DELETE FROM teacher_college_courses"))
+            db.session.execute(text("DELETE FROM teacher_school_subjects"))
+        except:
+            pass
         db.session.commit()
         
         # Delete teachers
@@ -406,13 +409,14 @@ def create_realistic_data():
     db.session.flush()
     
     # Create admin user
-    admin_user = User(
-        username="admin",
-        email="admin@adypu.edu.in",
-        password=generate_password_hash("admin123"),  # Hashed password
-        role="admin"
-    )
-    db.session.add(admin_user)
+    if not User.query.filter_by(username="admin").first():
+        admin_user = User(
+            username="admin",
+            email="admin@adypu.edu.in",
+            password=generate_password_hash("admin123"),
+            role="admin"
+        )
+        db.session.add(admin_user)
     
     # Add AppConfig
     configs = [

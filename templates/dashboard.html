@@ -1,37 +1,38 @@
 {% extends "base.html" %}
 
 {% block title %}
-    {% if session.get('role') == 'student' %}
-        Student Dashboard
-    {% else %}
-        Admin Dashboard
-    {% endif %}
+{% if session.get('role') == 'student' %}
+Student Dashboard
+{% else %}
+Admin Dashboard
+{% endif %}
 {% endblock %}
 
 {% block header %}
-    <div class="flex-grow">
-        <h2 class="text-2xl font-bold text-white">
-            {% if session.get('role') == 'student' %}Student Dashboard{% else %}Admin Dashboard{% endif %}
-        </h2>
-        <p class="text-sm text-gray-400">
-            {% if session.get('role') == 'student' %}View your timetable and courses.{% else %}Manage your institution's scheduling.{% endif %}
-        </p>
-    </div>
+<div class="flex-grow">
+    <h2 class="text-2xl font-bold text-white">
+        {% if session.get('role') == 'student' %}Student Dashboard{% else %}Admin Dashboard{% endif %}
+    </h2>
+    <p class="text-sm text-gray-400">
+        {% if session.get('role') == 'student' %}View your timetable and courses.{% else %}Manage your institution's
+        scheduling.{% endif %}
+    </p>
+</div>
 {% endblock %}
 
 {% block content %}
 <div class="space-y-8">
 
     <!-- ❌ SECTION TIMETABLES → Student me bhi hide, Admin me bhi hide -->
-    
+
 
     <!-- ✅ Stats Section → sabko show hoga -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {% for title, key in [
-            ('Total Students', 'total_students'),
-            ('Active Teachers', 'teachers'),
-            ('Classes Scheduled', 'classes_scheduled'),
-            ('Subjects Active', 'subjects')
+        ('Total Students', 'total_students'),
+        ('Active Teachers', 'teachers'),
+        ('Classes Scheduled', 'classes_scheduled'),
+        ('Subjects Active', 'subjects')
         ] %}
         <div class="glass-card p-6 rounded-2xl">
             <p class="text-sm text-gray-400">{{ title }}</p>
@@ -45,21 +46,29 @@
     <div class="glass-card p-6 rounded-2xl">
         <h3 class="text-xl font-semibold text-white mb-2">Quick Actions</h3>
         <p class="text-sm text-gray-400">Manage scheduling and classroom data.</p>
-        
+
+        <div class="mt-4">
+            <button id="faker-dashboard-btn"
+                class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition">
+                Generate Fake Data
+            </button>
+        </div>
+
         <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
             {% for label, url in [
-                ('Manage Students', '/subjects'),
-                ('Generate Timetable', '/timetable'),
-                ('Schedule Exams', '/exams'),
-                ('Semesters', '/semesters'),
-                ('Subjects', '/subjects'),
-                ('Teachers', '/staff'),
-                ('Classrooms', '/classrooms'),
-                ('Batches', '/batches'),
-                ('Timetable', '/timetable'),
-                ('Exams', '/exams')
+            ('Manage Students', '/subjects'),
+            ('Generate Timetable', '/timetable'),
+            ('Schedule Exams', '/exams'),
+            ('Semesters', '/semesters'),
+            ('Subjects', '/subjects'),
+            ('Teachers', '/staff'),
+            ('Classrooms', '/classrooms'),
+            ('Batches', '/batches'),
+            ('Timetable', '/timetable'),
+            ('Exams', '/exams')
             ] %}
-            <a href="{{ url }}" class="bg-gray-800/50 hover:bg-gray-700/80 p-4 rounded-lg flex flex-col items-center justify-center text-center transition-colors">
+            <a href="{{ url }}"
+                class="bg-gray-800/50 hover:bg-gray-700/80 p-4 rounded-lg flex flex-col items-center justify-center text-center transition-colors">
                 <span class="text-sm font-semibold text-gray-300">{{ label }}</span>
             </a>
             {% endfor %}
@@ -96,33 +105,63 @@
 
 {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    const role = "{{ session.get('role') }}";
+    document.addEventListener('DOMContentLoaded', () => {
+        const role = "{{ session.get('role') }}";
 
-    // student ke liye JS block karo ✅
-    if (role === "student") return;
+        // student ke liye JS block karo 
+        if (role === "student") return;
 
-    // timetable generate button (admin ke liye only) ✅
-    const genBtn = document.getElementById("generate-btn");
-    if (genBtn) {
-        genBtn.addEventListener("click", async () => {
-            try {
-                const res = await fetch("/api/generate_timetable", {method: "POST"});
-                if (res.ok) alert("✅ Timetable generated!");
-                else alert("❌ Generation failed");
-            } catch {
-                alert("❌ Server error");
-            }
-        });
-    }
+        // timetable generate button 
+        const genBtn = document.getElementById("generate-btn");
+        if (genBtn) {
+            genBtn.addEventListener("click", async () => {
+                try {
+                    const res = await fetch("/api/generate_timetable", { method: "POST" });
+                    if (res.ok) alert("✅ Timetable generated!");
+                    else alert("❌ Generation failed");
+                } catch {
+                    alert("❌ Server error");
+                }
+            });
+        }
 
-    // exam scheduling button ✅
-    const examBtn = document.getElementById("schedule-exams-btn");
-    if (examBtn) {
-        examBtn.addEventListener("click", () => {
-            window.location.href = "/exams";
-        });
-    }
-});
+        // exam scheduling button 
+        const examBtn = document.getElementById("schedule-exams-btn");
+        if (examBtn) {
+            examBtn.addEventListener("click", () => {
+                window.location.href = "/exams";
+            });
+        }
+
+        // 🔥 Faker button (FIXED)
+        const fakerBtn = document.getElementById("faker-dashboard-btn");
+
+        if (fakerBtn) {
+            fakerBtn.addEventListener("click", async () => {
+                if (!confirm("This will generate fake data. Continue?")) return;
+
+                fakerBtn.disabled = true;
+                fakerBtn.innerText = "Generating...";
+
+                try {
+                    const res = await fetch("/generate-fake-data", { method: "POST" });
+                    const data = await res.json();
+
+                    if (data.status === "success") {
+                        alert("✅ Fake data generated!");
+                        window.location.reload();
+                    } else {
+                        alert("❌ " + data.message);
+                    }
+                } catch {
+                    alert("❌ Server error");
+                } finally {
+                    fakerBtn.disabled = false;
+                    fakerBtn.innerText = "⚡ Generate Fake Data";
+                }
+            });
+        }
+
+    });
 </script>
 {% endblock %}

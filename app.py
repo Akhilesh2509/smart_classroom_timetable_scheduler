@@ -44,7 +44,11 @@ def create_app(config_class=Config):
     @app.before_request
     def check_setup():
         # Allow static files and the setup page to be accessed without checks
-        if request.endpoint and ('static' in request.endpoint or 'main.setup' in request.endpoint):
+        if request.endpoint and (
+            'static' in request.endpoint or 
+            'main.setup' in request.endpoint or
+            'main.generate_fake_data' in request.endpoint
+            ):
             return
         try:
             # If setup is not complete, redirect to the setup page

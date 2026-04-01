@@ -1,12 +1,15 @@
 import json
 from datetime import datetime, timezone
-from flask import Blueprint, render_template, request, redirect, url_for, session, g, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, session, g, flash, jsonify, current_app
 from sqlalchemy import exc
 
 from models import AppConfig, User, SchoolGroup, Grade, Stream, Subject, Semester, Department, Course, SystemMetric, ActivityLog, TimetableEntry
 from extensions import db
 from utils import hash_password, log_activity, calculate_growth, set_config
 from werkzeug.security import check_password_hash
+from init_db_realistic import create_realistic_data, clear_database
+from faker import Faker
+fake = Faker()
 
 main_bp = Blueprint('main', __name__)
 
@@ -105,6 +108,28 @@ def setup():
             return jsonify({'status': 'error', 'message': f'An unexpected error occurred: {e}. Please check the logs.'}), 500
             
     return render_template('setup.html')
+
+@main_bp.route('/generate-fake-data', methods=['POST'])
+def generate_fake_data():
+    try:
+        print("🔥 ROUTE HIT")
+
+        from flask import current_app
+        with current_app.app_context():
+            print("🔥 CREATING TABLES")
+            db.create_all()
+
+            print("🔥 CLEARING DB")
+            clear_database()
+
+            print("🔥 CREATING DATA")
+            create_realistic_data()
+
+        return jsonify({"status": "success", "redirect": "/login"})
+
+    except Exception as e:
+        print("🔥 FAKER ERROR:", e)
+        return jsonify({"status": "error", "message": str(e)})
 
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
