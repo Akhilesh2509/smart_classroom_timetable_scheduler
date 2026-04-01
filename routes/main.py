@@ -112,24 +112,30 @@ def setup():
 @main_bp.route('/generate-fake-data', methods=['POST'])
 def generate_fake_data():
     try:
-        print("🔥 ROUTE HIT")
-
         from flask import current_app
+
         with current_app.app_context():
-            print("🔥 CREATING TABLES")
             db.create_all()
-
-            print("🔥 CLEARING DB")
             clear_database()
-
-            print("🔥 CREATING DATA")
             create_realistic_data()
 
-        return jsonify({"status": "success", "redirect": "/login"})
+        if 'user_id' not in session:
+            return jsonify({
+                "status": "success",
+                "redirect": url_for('main.login')
+            })
+
+        return jsonify({"status": "success"})
 
     except Exception as e:
+        db.session.rollback()
         print("🔥 FAKER ERROR:", e)
-        return jsonify({"status": "error", "message": str(e)})
+
+        # 🔥 FORCE JSON RESPONSE
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():
