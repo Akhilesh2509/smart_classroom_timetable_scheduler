@@ -7,6 +7,7 @@ from config import Config
 from extensions import db
 from models import AppConfig, User, Subject, Course, TimetableEntry, SystemMetric
 
+
 def create_app(config_class=Config):
     # --- App Initialization ---
     app = Flask(__name__)
@@ -14,6 +15,10 @@ def create_app(config_class=Config):
 
     # --- Initialize Extensions ---
     db.init_app(app)
+
+    # CREATE TABLES ON STARTUP
+    with app.app_context():
+        db.create_all()
 
     # --- Import and Register Blueprints ---
     from routes.main import main_bp
@@ -40,52 +45,73 @@ def create_app(config_class=Config):
     app.register_blueprint(exams_bp)
     app.register_blueprint(electives_bp)
 
-    # --- Application Hooks & Context Processors ---
+    # --- Application Hooks ---
     @app.before_request
     def check_setup():
-        # Allow static files and the setup page to be accessed without checks
         if request.endpoint and (
             'static' in request.endpoint or 
             'main.setup' in request.endpoint or
             'main.generate_fake_data' in request.endpoint
-            ):
+        ):
             return
+
         try:
-            # If setup is not complete, redirect to the setup page
             if not AppConfig.query.filter_by(key='setup_complete', value='true').first():
                 return redirect(url_for('main.setup'))
-            # Load the application mode (school/college) into the global context `g`
-            g.app_mode = AppConfig.query.filter_by(key='app_mode').first().value
-        except Exception as e:
-            # If the database/tables don't exist, an error will occur. Redirect to setup.
-            print(f"Redirecting to setup due to error: {e}")
-            return redirect(url_for('main.setup'))
 
+            config = AppConfig.query.filter_by(key='app_mode').first()
+            if config:
+                g.app_mode = config.value
+
+        except Exception as e:
+            # 🔥 IMPORTANT FIX (avoid crash on first run)
+            print(f"DB not ready yet: {e}")
+            return None
+
+    # --- Global Variables ---
     @app.context_processor
     def inject_global_vars():
-        # This makes 'institute_name' available in all templates
         try:
             config = AppConfig.query.filter_by(key='institute_name').first()
             return {'institute_name': config.value if config else 'Scheduler AI'}
         except Exception:
             return {'institute_name': 'Scheduler AI'}
 
+    # OPTIONAL: Metrics safe execution
+    with app.app_context():
+        try:
+            today = datetime.now(timezone.utc).date()
+
+            if not SystemMetric.query.filter_by(date=today).first():
+                db.session.add(SystemMetric(
+                    key='total_students',
+                    value=User.query.filter_by(role='student').count()
+                ))
+                db.session.add(SystemMetric(
+                    key='total_teachers',
+                    value=User.query.filter_by(role='teacher').count()
+                ))
+
+                total_subjects = Subject.query.count() + Course.query.count()
+                db.session.add(SystemMetric(
+                    key='total_subjects',
+                    value=total_subjects
+                ))
+
+                db.session.add(SystemMetric(
+                    key='classes_scheduled',
+                    value=TimetableEntry.query.count()
+                ))
+
+                db.session.commit()
+
+        except Exception as e:
+            print(f"Metrics error: {e}")
+
     return app
 
+
+# --- Local only ---
 if __name__ == '__main__':
     app = create_app()
-    with app.app_context():
-        # Create database tables if they don't exist
-        db.create_all()
-        
-        # Log system metrics once per day
-        today = datetime.now(timezone.utc).date()
-        if not SystemMetric.query.filter_by(date=today).first():
-             db.session.add(SystemMetric(key='total_students', value=User.query.filter_by(role='student').count()))
-             db.session.add(SystemMetric(key='total_teachers', value=User.query.filter_by(role='teacher').count()))
-             total_subjects = Subject.query.count() + Course.query.count()
-             db.session.add(SystemMetric(key='total_subjects', value=total_subjects))
-             db.session.add(SystemMetric(key='classes_scheduled', value=TimetableEntry.query.count()))
-             db.session.commit()
-             
     app.run(debug=True, port=8000)
