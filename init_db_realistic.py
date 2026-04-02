@@ -147,56 +147,48 @@ def create_realistic_data():
             ("Algorithms", "CSE_ALG102", 4, False),
             ("Object Oriented Programming", "CSE_OOP103", 3, False),
             ("Database Management Systems", "CSE_DBMS201", 4, False),
-            ("Operating Systems", "CSE_OS202", 4, False),
         ],
         "Electronics and Communication Engineering": [
             ("Digital Electronics", "ECE_DE101", 4, False),
             ("Analog Electronics", "ECE_AE102", 4, False),
             ("Signals and Systems", "ECE_SS103", 4, False),
             ("Communication Systems", "ECE_CS201", 4, False),
-            ("Microprocessors", "ECE_MP202", 3, False),
         ],
         "Information Technology": [
             ("Programming Fundamentals", "IT_PF101", 4, False),
             ("Data Structures and Algorithms", "IT_DSA102", 4, False),
             ("Database Systems", "IT_DBS103", 4, False),
             ("Web Technologies", "IT_WT201", 3, False),
-            ("Software Testing", "IT_ST202", 3, False),
         ],
         "Mechanical Engineering": [
             ("Engineering Mechanics", "ME_EM101", 4, False),
             ("Thermodynamics", "ME_TD102", 4, False),
             ("Fluid Mechanics", "ME_FM103", 4, False),
             ("Machine Design", "ME_MD201", 4, False),
-            ("Manufacturing Processes", "ME_MP202", 3, False),
         ],
         "Civil Engineering": [
             ("Structural Analysis", "CE_SA101", 4, False),
             ("Concrete Technology", "CE_CT102", 4, False),
             ("Soil Mechanics", "CE_SM103", 4, False),
             ("Transportation Engineering", "CE_TE201", 3, False),
-            ("Environmental Engineering", "CE_EE202", 3, False),
         ],
         "Electrical Engineering": [
             ("Circuit Analysis", "EE_CA101", 4, False),
             ("Electromagnetic Fields", "EE_EMF102", 4, False),
             ("Power Systems", "EE_PS103", 4, False),
             ("Control Systems", "EE_CS201", 3, False),
-            ("Electrical Machines", "EE_EM202", 3, False),
         ],
         "Aerospace Engineering": [
             ("Aerodynamics", "AE_AD101", 4, False),
             ("Flight Mechanics", "AE_FM102", 4, False),
             ("Aircraft Structures", "AE_AS103", 4, False),
             ("Propulsion Systems", "AE_PS201", 3, False),
-            ("Aircraft Design", "AE_AD202", 3, False),
         ],
         "Chemical Engineering": [
             ("Chemical Process Calculations", "CHE_CPC101", 4, False),
             ("Thermodynamics", "CHE_TD102", 4, False),
             ("Mass Transfer", "CHE_MT103", 4, False),
             ("Heat Transfer", "CHE_HT201", 3, False),
-            ("Chemical Reaction Engineering", "CHE_CRE202", 3, False),
         ]
     }
     
@@ -252,7 +244,7 @@ def create_realistic_data():
     # Create sections for each department
     sections = []
     for dept in departments:
-        for section_letter in ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']:  # 8 sections per department
+        for section_letter in ['A', 'B']:  # 2 sections per department
             section = StudentSection(
                 name=f"Section {section_letter}",
                 capacity=30,
@@ -266,10 +258,10 @@ def create_realistic_data():
     
     # Create classrooms
     classrooms = []
-    building_names = ['A', 'B', 'C', 'D', 'E']
+    building_names = ['A', 'B']
     for building in building_names:
-        for floor in range(1, 4):
-            for room in range(1, 6):
+        for floor in range(1, 3):  # 2 floors
+            for room in range(1, 4):  # 3 rooms per floor
                 room_id = f"{building}{floor}{room:02d}"
                 capacity = random.randint(25, 50)
                 features = random.choice([
@@ -292,7 +284,7 @@ def create_realistic_data():
     
     # Create users and teachers
     teachers = []
-    for i in range(20):  # 20 teachers
+    for i in range(15):  # 20 teachers
         user = User(
             username=f"teacher{i+1:02d}",
             email=f"teacher{i+1:02d}@adypu.edu.in",
@@ -333,7 +325,7 @@ def create_realistic_data():
     
     # Create students
     students = []
-    for i in range(200):  # 200 students
+    for i in range(120):  # 120 students
         user = User(
             username=f"student{i+1:03d}",
             email=f"student{i+1:03d}@adypu.edu.in",
