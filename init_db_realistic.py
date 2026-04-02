@@ -1,9 +1,4 @@
 #!/usr/bin/env python3
-"""
-Realistic Database Initialization Script
-Creates a more realistic school/college structure with proper subject-department relationships
-"""
-
 import os
 import sys
 from faker import Faker
@@ -345,7 +340,7 @@ def create_realistic_data():
     
     # Create users and teachers
     teachers = []
-    for i in range(80):  # 80 teachers (more coverage)
+    for i in range(20):  # 20 teachers
         user = User(
             username=f"teacher{i+1:02d}",
             email=f"teacher{i+1:02d}@adypu.edu.in",
@@ -386,7 +381,7 @@ def create_realistic_data():
     
     # Create students
     students = []
-    for i in range(600):  # 600 students (more than 500 minimum)
+    for i in range(200):  # 200 students
         user = User(
             username=f"student{i+1:03d}",
             email=f"student{i+1:03d}@adypu.edu.in",
