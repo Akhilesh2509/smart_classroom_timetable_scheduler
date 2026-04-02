@@ -148,12 +148,6 @@ def create_realistic_data():
             ("Object Oriented Programming", "CSE_OOP103", 3, False),
             ("Database Management Systems", "CSE_DBMS201", 4, False),
             ("Operating Systems", "CSE_OS202", 4, False),
-            ("Computer Networks", "CSE_CN203", 3, False),
-            ("Software Engineering", "CSE_SE301", 3, False),
-            ("Machine Learning", "CSE_ML302", 3, False),
-            ("Artificial Intelligence", "CSE_AI303", 3, False),
-            ("Web Development", "CSE_WD401", 3, True),
-            ("Mobile App Development", "CSE_MAD402", 3, True)
         ],
         "Electronics and Communication Engineering": [
             ("Digital Electronics", "ECE_DE101", 4, False),
@@ -161,12 +155,6 @@ def create_realistic_data():
             ("Signals and Systems", "ECE_SS103", 4, False),
             ("Communication Systems", "ECE_CS201", 4, False),
             ("Microprocessors", "ECE_MP202", 3, False),
-            ("VLSI Design", "ECE_VLSI203", 3, False),
-            ("Embedded Systems", "ECE_ES301", 3, False),
-            ("Digital Signal Processing", "ECE_DSP302", 3, False),
-            ("Wireless Communication", "ECE_WC303", 3, False),
-            ("IoT Development", "ECE_IOT401", 3, True),
-            ("Robotics", "ECE_ROB402", 3, True)
         ],
         "Information Technology": [
             ("Programming Fundamentals", "IT_PF101", 4, False),
@@ -174,12 +162,6 @@ def create_realistic_data():
             ("Database Systems", "IT_DBS103", 4, False),
             ("Web Technologies", "IT_WT201", 3, False),
             ("Software Testing", "IT_ST202", 3, False),
-            ("Computer Networks", "IT_CN203", 3, False),
-            ("Information Security", "IT_IS301", 3, False),
-            ("Cloud Computing", "IT_CC302", 3, False),
-            ("Big Data Analytics", "IT_BDA303", 3, False),
-            ("DevOps", "IT_DO401", 3, True),
-            ("Blockchain Technology", "IT_BT402", 3, True)
         ],
         "Mechanical Engineering": [
             ("Engineering Mechanics", "ME_EM101", 4, False),
@@ -187,12 +169,6 @@ def create_realistic_data():
             ("Fluid Mechanics", "ME_FM103", 4, False),
             ("Machine Design", "ME_MD201", 4, False),
             ("Manufacturing Processes", "ME_MP202", 3, False),
-            ("Heat Transfer", "ME_HT203", 3, False),
-            ("Automotive Engineering", "ME_AE301", 3, False),
-            ("CAD/CAM", "ME_CAD302", 3, False),
-            ("Robotics and Automation", "ME_RA303", 3, False),
-            ("Renewable Energy", "ME_RE401", 3, True),
-            ("Aerospace Engineering", "ME_ASE402", 3, True)
         ],
         "Civil Engineering": [
             ("Structural Analysis", "CE_SA101", 4, False),
@@ -200,12 +176,6 @@ def create_realistic_data():
             ("Soil Mechanics", "CE_SM103", 4, False),
             ("Transportation Engineering", "CE_TE201", 3, False),
             ("Environmental Engineering", "CE_EE202", 3, False),
-            ("Water Resources", "CE_WR203", 3, False),
-            ("Construction Management", "CE_CM301", 3, False),
-            ("Geotechnical Engineering", "CE_GE302", 3, False),
-            ("Urban Planning", "CE_UP303", 3, False),
-            ("Sustainable Construction", "CE_SC401", 3, True),
-            ("Smart Cities", "CE_SC402", 3, True)
         ],
         "Electrical Engineering": [
             ("Circuit Analysis", "EE_CA101", 4, False),
@@ -213,12 +183,6 @@ def create_realistic_data():
             ("Power Systems", "EE_PS103", 4, False),
             ("Control Systems", "EE_CS201", 3, False),
             ("Electrical Machines", "EE_EM202", 3, False),
-            ("Power Electronics", "EE_PE203", 3, False),
-            ("Renewable Energy Systems", "EE_RES301", 3, False),
-            ("Smart Grid", "EE_SG302", 3, False),
-            ("Electric Vehicles", "EE_EV303", 3, False),
-            ("IoT in Power Systems", "EE_IOT401", 3, True),
-            ("Energy Storage", "EE_ES402", 3, True)
         ],
         "Aerospace Engineering": [
             ("Aerodynamics", "AE_AD101", 4, False),
@@ -226,12 +190,6 @@ def create_realistic_data():
             ("Aircraft Structures", "AE_AS103", 4, False),
             ("Propulsion Systems", "AE_PS201", 3, False),
             ("Aircraft Design", "AE_AD202", 3, False),
-            ("Space Technology", "AE_ST203", 3, False),
-            ("Avionics", "AE_AV301", 3, False),
-            ("Aircraft Maintenance", "AE_AM302", 3, False),
-            ("Unmanned Aerial Vehicles", "AE_UAV303", 3, False),
-            ("Space Exploration", "AE_SE401", 3, True),
-            ("Satellite Technology", "AE_ST402", 3, True)
         ],
         "Chemical Engineering": [
             ("Chemical Process Calculations", "CHE_CPC101", 4, False),
@@ -239,12 +197,6 @@ def create_realistic_data():
             ("Mass Transfer", "CHE_MT103", 4, False),
             ("Heat Transfer", "CHE_HT201", 3, False),
             ("Chemical Reaction Engineering", "CHE_CRE202", 3, False),
-            ("Process Control", "CHE_PC203", 3, False),
-            ("Petroleum Engineering", "CHE_PE301", 3, False),
-            ("Biochemical Engineering", "CHE_BE302", 3, False),
-            ("Environmental Engineering", "CHE_EE303", 3, False),
-            ("Pharmaceutical Engineering", "CHE_PE401", 3, True),
-            ("Green Chemistry", "CHE_GC402", 3, True)
         ]
     }
     
