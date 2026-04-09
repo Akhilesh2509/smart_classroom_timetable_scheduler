@@ -8,13 +8,132 @@
 <div class="flex-grow">
     <h2 class="text-2xl font-bold text-white">Manage Classrooms</h2>
     <p class="text-sm text-gray-400">Oversee all physical rooms and learning spaces.</p>
+    <style>
+
+/* ===== CARD ===== */
+.glass-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+/* ===== TEXT ===== */
+.text-white {
+    color: #111827 !important;
+}
+
+.text-gray-300 {
+    color: #374151 !important;
+}
+
+.text-gray-400 {
+    color: #6b7280 !important;
+}
+
+/* ===== INPUT ===== */
+.input-base {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #111827 !important;
+}
+
+.input-base:focus {
+    border-color: #7091E6 !important;
+    box-shadow: 0 0 0 2px #EDE8F5 !important;
+}
+
+/* ===== SEARCH BAR FIX ===== */
+input[type="text"] {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #111827 !important;
+}
+
+/* ===== TABLE ===== */
+thead {
+    background: #EDE8F5 !important;
+    color: #111827 !important;
+}
+
+.border-gray-800 {
+    border-color: #e5e7eb !important;
+}
+
+/* ROW HOVER */
+.hover\:bg-slate-800\/40:hover {
+    background: #f5f7ff !important;
+}
+
+/* TAGS */
+.bg-gray-700 {
+    background: #EDE8F5 !important;
+    color: #3D52A0 !important;
+}
+
+/* ===== BUTTONS ===== */
+.btn-primary {
+    background: #7091E6;
+    color: white;
+}
+.btn-primary:hover {
+    background: #3D52A0;
+}
+.btn-primary:disabled {
+    background: #c7d2fe;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: #e5e7eb;
+    color: #111827;
+}
+.btn-secondary:hover {
+    background: #d1d5db;
+}
+
+/* ===== ADD BUTTON (purple fix) ===== */
+.bg-purple-600 {
+    background: #7091E6 !important;
+}
+.bg-purple-700 {
+    background: #3D52A0 !important;
+}
+
+/* ===== MODAL ===== */
+.bg-gray-900 {
+    background: #ffffff !important;
+}
+
+.border-gray-700 {
+    border-color: #e5e7eb !important;
+}
+
+.bg-gray-800 {
+    background: #f9fafb !important;
+}
+
+/* ===== FEATURE BUTTON ===== */
+.bg-gray-700 {
+    background: #f1f5f9 !important;
+    color: #111827 !important;
+}
+
+.bg-gray-600 {
+    background: #e2e8f0 !important;
+}
+
+/* ACTIVE FEATURE */
+.bg-purple-600.text-white {
+    background: #7091E6 !important;
+}
+
+</style>
 </div>
 {% endblock %}
 
 {% block content %}
 <div id="app" class="space-y-6">
     <!-- Header with Search and Add Button -->
-    <div class="flex justify-between items-center bg-slate-900/50 p-4 rounded-xl">
+   <div class="flex justify-between items-center bg-white border border-gray-200 p-4 rounded-xl">
         <div class="relative w-full max-w-xs">
             <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                 <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>

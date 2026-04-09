@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -7,151 +7,219 @@
     <title>Setup - Scheduler AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+    }
 
-        .glass-card {
-            background: rgba(17, 24, 39, 0.7);
-            backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+    /* ===== CARD ===== */
+    .glass-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
 
-        .bg-gradient-body {
-            background-color: #0c0a09;
-            background-image: radial-gradient(at 2% 5%, rgb(30, 27, 44) 0px, transparent 50%), radial-gradient(at 98% 98%, rgb(20, 32, 53) 0px, transparent 50%);
-        }
+    /* ===== BACKGROUND ===== */
+    .bg-gradient-body {
+        background: linear-gradient(135deg, #f8fafc, #EDE8F5);
+    }
 
-        .form-section {
-            display: none;
-            animation: fadeIn 0.5s ease-in-out;
-        }
+    /* ===== FORM ===== */
+    .form-section {
+        display: none;
+        animation: fadeIn 0.5s ease-in-out;
+    }
 
-        .form-section.active {
-            display: block;
-        }
+    .form-section.active {
+        display: block;
+    }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+    .step-indicator {
+        transition: all 0.3s ease-in-out;
+    }
 
-        .step-indicator {
-            transition: all 0.3s ease-in-out;
-        }
+    /* ===== INPUT ===== */
+ .input-base {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #111827 !important;
+}
 
-        .input-base {
-            background-color: rgba(31, 41, 55, 0.5);
-            border: 1px solid #4b5563;
-            color: #d1d5db;
-            padding: 0.65rem 1rem;
-            border-radius: 0.5rem;
-            width: 100%;
-            transition: all 0.2s ease;
-        }
+    .input-base:focus {
+        outline: none;
+        border-color: #7091E6;
+        box-shadow: 0 0 0 3px rgba(112,145,230,0.2);
+    }
 
-        .input-base:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px #111827, 0 0 0 4px #8b5cf6;
-            border-color: #8b5cf6;
-        }
+    .input-base.invalid {
+        border-color: #ef4444;
+        box-shadow: 0 0 0 3px rgba(239,68,68,0.2);
+    }
 
-        .input-base.invalid {
-            border-color: #ef4444;
-            box-shadow: 0 0 0 2px #111827, 0 0 0 4px #ef4444;
-        }
+    /* ===== BUTTON ===== */
+    .btn {
+        padding: 0.65rem 1.5rem;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
 
-        .btn {
-            padding: 0.65rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
+    .btn-primary {
+        background: linear-gradient(135deg, #7091E6, #3D52A0);
+        color: white;
+    }
 
-        .btn-primary {
-            background-color: #7c3aed;
-            color: white;
-        }
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(61,82,160,0.3);
+    }
 
-        .btn-primary:hover {
-            background-color: #8b5cf6;
-        }
+    .btn-primary:disabled {
+        background: #c7d2fe;
+        color: #6b7280;
+        cursor: not-allowed;
+    }
 
-        .btn-primary:disabled {
-            background-color: #585068;
-            color: #a1a1aa;
-            cursor: not-allowed;
-        }
+    .btn-secondary {
+        background: #e5e7eb;
+        color: #111827;
+    }
 
-        .btn-secondary {
-            background-color: #4b5563;
-            color: white;
-        }
+    .btn-secondary:hover {
+        background: #d1d5db;
+    }
 
-        .btn-secondary:hover {
-            background-color: #6b7280;
-        }
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
 
-        .btn-danger {
-            background-color: #be123c;
-            color: white;
-        }
+    .btn-danger:hover {
+        background: #dc2626;
+    }
 
-        .btn-danger:hover {
-            background-color: #e11d48;
-        }
+    /* ===== SELECTION CARD ===== */
+    .selection-card {
+        border: 2px solid #e5e7eb;
+        background: #ffffff;
+        border-radius: 12px;
+        transition: all 0.25s ease;
+    }
 
-        .selection-card {
-            border: 2px solid #4b5563;
-            transition: all 0.2s ease;
-        }
+    .selection-card:hover {
+        border-color: #7091E6;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+    }
 
-        .selection-card:hover {
-            border-color: #a78bfa;
-        }
+    .selection-card.selected {
+        border-color: #7091E6;
+        box-shadow: 0 0 0 3px rgba(112,145,230,0.2);
+    }
 
-        .selection-card.selected {
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 2px #8b5cf6;
-        }
+    /* ===== SUMMARY ===== */
+    .summary-item {
+        background: #ffffff;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        border: 1px solid #e5e7eb;
+    }
 
-        .summary-item {
-            background-color: rgba(31, 41, 55, 0.3);
-            padding: 1rem;
-            border-radius: 0.5rem;
-            border: 1px solid #4b5563;
-        }
+    /* ===== REMOVE BUTTON ===== */
+    .remove-btn {
+        color: #ef4444;
+        background: #fee2e2;
+        border-radius: 9999px;
+        padding: 0.25rem;
+    }
 
-        .remove-btn {
-            color: #f87171;
-            background-color: rgba(239, 68, 68, 0.1);
-            border-radius: 9999px;
-            padding: 0.25rem;
-        }
+    .remove-btn:hover {
+        color: white;
+        background: #ef4444;
+    }
+    /* FORCE REMOVE DARK COLORS */
+[class*="bg-gray-800"] {
+    background: #ffffff !important;
+}
 
-        .remove-btn:hover {
-            color: white;
-            background-color: #ef4444;
-        }
-    </style>
+[class*="bg-gray-800/50"] {
+    background: #ffffff !important;
+}
+
+[class*="border-gray-700"] {
+    border-color: #e5e7eb !important;
+}
+
+[class*="text-white"] {
+    color: #111827 !important;
+}
+
+/* CHECKBOX FIX */
+input[type="checkbox"] {
+    accent-color: #7091E6;
+}
+/* SUMMARY ITEMS */
+#summary-container > div {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 14px;
+    transition: all 0.2s ease;
+}
+
+#summary-container > div:hover {
+    background: #f1f5f9;
+    transform: translateY(-2px);
+}
+
+/* SCROLLBAR */
+#summary-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+#summary-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+/* SUMMARY TEXT FIX */
+#summary-container {
+    color: #111827 !important;
+}
+
+/* All faded text fix */
+#summary-container * {
+    color: #111827 !important;
+}
+
+/* Heading color (purple ko thoda premium bana) */
+#summary-container h3 {
+    color: #7c3aed !important;
+    font-weight: 700;
+}
+
+/* Sub text (like Name, Type, etc.) */
+#summary-container p,
+#summary-container span,
+#summary-container div {
+    color: #374151 !important;
+}
+</style>
 </head>
 
 <body class="bg-gradient-body text-gray-200 min-h-screen p-4 flex items-center justify-center">
     <div class="w-full max-w-4xl mx-auto">
         <div id="setup-container" class="p-4 sm:p-8 space-y-6 glass-card rounded-2xl shadow-2xl">
-            <h1 class="text-3xl font-bold text-center text-white">Scheduler AI Initial Setup</h1>
+           <h1 class="text-3xl font-bold text-center text-gray-800">Scheduler AI Initial Setup</h1>
             <div id="error-banner"
                 class="hidden bg-red-500/20 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg text-center">
             </div>
@@ -199,73 +267,202 @@
                         </div>
                     </div>
                 </div>
-                <!-- Step 2: Basic Details -->
-                <div id="step-2" class="form-section">
-                    <h2 class="text-2xl font-semibold mb-6 text-center text-white">Institution Details</h2>
-                    <div class="space-y-6">
-                        <div><label for="institute_name"
-                                class="block text-sm font-medium text-gray-300 mb-1">Institution Name</label><input
-                                type="text" id="institute_name" name="institute_name" class="input-base"
-                                placeholder="e.g., Quantum High School" required></div>
-                        <div class="border-t border-gray-700 pt-6">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-semibold">Time Structure</h3><button type="button"
-                                    class="btn btn-secondary text-sm" onclick="applyPreset()">Load Preset</button>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                <div><label for="working_days"
-                                        class="block text-sm font-medium text-gray-300 mb-1">Working Days</label><select
-                                        id="working_days" name="working_days" class="input-base" required>
-                                        <option>Monday - Friday</option>
-                                        <option>Monday - Saturday</option>
-                                    </select></div>
-                                <div><label for="start_time" class="block text-sm font-medium text-gray-300 mb-1">Start
-                                        Time</label><input type="time" id="start_time" name="start_time"
-                                        class="input-base" required></div>
-                                <div><label for="end_time" class="block text-sm font-medium text-gray-300 mb-1">End
-                                        Time</label><input type="time" id="end_time" name="end_time" class="input-base"
-                                        required></div>
-                                <div><label for="period_duration"
-                                        class="block text-sm font-medium text-gray-300 mb-1">Period (min)</label><input
-                                        type="number" id="period_duration" name="period_duration" class="input-base"
-                                        value="60" required></div>
-                            </div>
-                        </div>
-                        <div class="border-t border-gray-700 pt-6">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-semibold">Breaks</h3><button type="button"
-                                    class="btn btn-secondary text-sm" onclick="addBreak()">+ Add Break</button>
-                            </div>
-                            <div id="breaks-container" class="space-y-3"></div>
-                        </div>
-                    </div>
+               <!-- Step 2: Basic Details -->
+<div id="step-2" class="form-section">
+
+    <h2 class="text-3xl font-bold mb-8 text-center text-gray-800 tracking-tight">
+        Institution Details
+    </h2>
+
+    <div class="space-y-8">
+
+        <!-- Institution Name -->
+        <div>
+            <label for="institute_name"
+                class="block text-sm font-semibold text-gray-700 mb-2">
+                Institution Name
+            </label>
+
+            <input type="text" id="institute_name" name="institute_name"
+                class="input-base w-full shadow-sm focus:shadow-md transition"
+                placeholder="e.g., Quantum High School" required>
+        </div>
+
+        <!-- Time Structure -->
+        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-lg font-bold text-gray-800">
+                    Time Structure
+                </h3>
+
+                <button type="button"
+                    class="btn btn-secondary text-sm hover:shadow-sm transition"
+                    onclick="applyPreset()">
+                    Load Preset
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                <div>
+                    <label for="working_days"
+                        class="block text-sm font-medium text-gray-600 mb-1">
+                        Working Days
+                    </label>
+
+                    <select id="working_days" name="working_days"
+                        class="input-base w-full" required>
+                        <option>Monday - Friday</option>
+                        <option>Monday - Saturday</option>
+                    </select>
                 </div>
-                <!-- Step 3: Structure -->
-                <div id="step-3" class="form-section">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 id="structure-title" class="text-2xl font-semibold text-white">Academic Structure</h2>
-                        <button id="add-group-btn" type="button" class="btn btn-secondary"
-                            onclick="addStructureGroup()">+ Add Group</button>
-                    </div>
-                    <div id="structure-container" class="space-y-6 max-h-[400px] overflow-y-auto pr-2"></div>
+
+                <div>
+                    <label for="start_time"
+                        class="block text-sm font-medium text-gray-600 mb-1">
+                        Start Time
+                    </label>
+
+                    <input type="time" id="start_time" name="start_time"
+                        class="input-base w-full" required>
                 </div>
-                <!-- Step 4: Summary -->
-                <div id="step-4" class="form-section">
-                    <h2 class="text-2xl font-semibold mb-6 text-center text-white">Confirm Details</h2>
-                    <div id="summary-container" class="space-y-6 max-h-[400px] overflow-y-auto p-2"></div>
+
+                <div>
+                    <label for="end_time"
+                        class="block text-sm font-medium text-gray-600 mb-1">
+                        End Time
+                    </label>
+
+                    <input type="time" id="end_time" name="end_time"
+                        class="input-base w-full" required>
                 </div>
-                <!-- Step 5: Admin Account -->
-                <div id="step-5" class="form-section">
-                    <h2 class="text-2xl font-semibold mb-6 text-center text-white">Create Admin Account</h2>
-                    <div class="w-full max-w-sm mx-auto space-y-4">
-                        <div><label for="username" class="block text-sm font-medium text-gray-300 mb-1">Admin
-                                Username</label><input type="text" id="username" name="username" class="input-base"
-                                required></div>
-                        <div><label for="password"
-                                class="block text-sm font-medium text-gray-300 mb-1">Password</label><input
-                                type="password" id="password" name="password" class="input-base" required></div>
-                    </div>
+
+                <div>
+                    <label for="period_duration"
+                        class="block text-sm font-medium text-gray-600 mb-1">
+                        Period (min)
+                    </label>
+
+                    <input type="number" id="period_duration"
+                        name="period_duration"
+                        class="input-base w-full"
+                        value="60" required>
                 </div>
+
+            </div>
+        </div>
+
+        <!-- Breaks -->
+        <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+
+            <div class="flex justify-between items-center mb-5">
+                <h3 class="text-lg font-bold text-gray-800">
+                    Breaks
+                </h3>
+
+                <button type="button"
+                    class="btn btn-secondary text-sm hover:shadow-sm transition"
+                    onclick="addBreak()">
+                    + Add Break
+                </button>
+            </div>
+
+            <div id="breaks-container" class="space-y-4"></div>
+
+        </div>
+
+    </div>
+</div>
+               
+<!-- Step 3: Structure -->
+<div id="step-3" class="form-section">
+
+    <div class="flex justify-between items-center mb-6">
+        <h2 id="structure-title"
+            class="text-3xl font-bold text-gray-800 tracking-tight">
+            Academic Structure
+        </h2>
+
+        <button id="add-group-btn" type="button"
+            class="btn btn-primary shadow hover:shadow-md transition"
+            onclick="addStructureGroup()">
+            + Add Group
+        </button>
+    </div>
+
+    <!-- CARD CONTAINER -->
+    <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+
+        <div id="structure-container"
+            class="space-y-6 max-h-[400px] overflow-y-auto pr-2">
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Step 4: Summary -->
+<div id="step-4" class="form-section">
+
+    <h2 class="text-3xl font-extrabold mb-8 text-center text-gray-800 tracking-tight">
+        Confirm Details
+    </h2>
+
+    <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-md">
+
+        <!-- HEADER -->
+        <div class="mb-5 pb-3 border-b border-gray-200">
+            <p class="text-sm text-gray-500">
+                Review all details before finalizing setup
+            </p>
+        </div>
+
+        <!-- SCROLL AREA -->
+        <div id="summary-container"
+            class="space-y-5 max-h-[400px] overflow-y-auto pr-2">
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Step 5: Admin Account -->
+<div id="step-5" class="form-section">
+
+    <h2 class="text-3xl font-bold mb-6 text-center text-gray-800 tracking-tight">
+        Create Admin Account
+    </h2>
+
+    <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm w-full max-w-sm mx-auto space-y-5">
+
+        <div>
+            <label for="username"
+                class="block text-sm font-semibold text-gray-700 mb-2">
+                Admin Username
+            </label>
+
+            <input type="text" id="username" name="username"
+                class="input-base w-full shadow-sm focus:shadow-md transition"
+                required>
+        </div>
+
+        <div>
+            <label for="password"
+                class="block text-sm font-semibold text-gray-700 mb-2">
+                Password
+            </label>
+
+            <input type="password" id="password" name="password"
+                class="input-base w-full shadow-sm focus:shadow-md transition"
+                required>
+        </div>
+
+    </div>
+
+</div>
             </form>
 
             <div class="flex justify-between items-center pt-5 border-t border-gray-700 mt-8">
@@ -301,39 +498,86 @@
                 class="input-base" placeholder="e.g., Lunch Break" required><input type="time" name="break_starts"
                 class="input-base" required><input type="time" name="break_ends" class="input-base" required></div>
     </template>
-    <!-- School Templates -->
-    <template id="school-group-template">
-        <div class="group-item glass-card p-4 rounded-lg">
-            <div class="flex justify-between items-center mb-4"><input type="text" class="input-base w-1/2"
-                    placeholder="Group Name (e.g., Primary School)" required></div>
-            <div class="pl-4 border-l-2 border-gray-700 space-y-4">
-                <div class="grades-container space-y-2"></div><button type="button" class="btn btn-secondary text-xs"
-                    onclick="addSchoolGrade(this)">+ Add Grade</button>
-                <div class="streams-container space-y-3 mt-3"></div><button type="button"
-                    class="btn btn-secondary text-xs" onclick="addSchoolStream(this)">+ Add Stream</button>
-            </div>
+ <!-- School Templates -->
+<template id="school-group-template">
+    <div class="group-item glass-card p-4 rounded-lg">
+        <div class="flex justify-between items-center mb-4">
+            <input type="text" class="input-base w-1/2"
+                placeholder="Group Name (e.g., Primary School)" required>
         </div>
-    </template>
-    <template id="school-grade-template">
-        <div class="grade-item flex items-center gap-2"><input type="text" class="input-base"
-                placeholder="Grade Name (e.g., Grade 1)" required></div>
-    </template>
-    <template id="school-stream-template">
-        <div class="stream-item bg-gray-800/50 p-3 rounded-md">
-            <div class="flex justify-between items-center mb-3"><input type="text" class="input-base w-1/2"
-                    placeholder="Stream Name (e.g., Science)" required></div>
-            <div class="subjects-container space-y-2"></div><button type="button" class="btn btn-secondary text-xs"
-                onclick="addSchoolSubject(this)">+ Add Subject</button>
+
+        <!-- FIXED BORDER -->
+        <div class="pl-4 border-l-2 border-gray-200 space-y-4">
+
+            <div class="grades-container space-y-2"></div>
+
+            <!-- MODERN BUTTON -->
+            <button type="button"
+                class="btn btn-secondary text-xs bg-[#f1f5f9] text-gray-800 hover:bg-[#e2e8f0]"
+                onclick="addSchoolGrade(this)">
+                + Add Grade
+            </button>
+
+            <div class="streams-container space-y-3 mt-3"></div>
+
+            <button type="button"
+                class="btn btn-secondary text-xs bg-[#f1f5f9] text-gray-800 hover:bg-[#e2e8f0]"
+                onclick="addSchoolStream(this)">
+                + Add Stream
+            </button>
+
         </div>
-    </template>
-    <template id="school-subject-template">
-        <div class="subject-item grid grid-cols-12 gap-2 items-center"><input type="text" class="input-base col-span-2"
-                placeholder="Code" required><input type="text" class="input-base col-span-5" placeholder="Subject Name"
-                required><input type="number" class="input-base col-span-2" placeholder="Hrs/Wk" required><label
-                class="flex items-center justify-center gap-1 col-span-2 text-sm"><input type="checkbox"
-                    class="h-4 w-4 rounded bg-gray-700 border-gray-600 text-purple-600 focus:ring-purple-600">Elective</label>
+    </div>
+</template>
+
+<template id="school-grade-template">
+    <div class="grade-item flex items-center gap-2">
+        <input type="text" class="input-base"
+            placeholder="Grade Name (e.g., Grade 1)" required>
+    </div>
+</template>
+
+<template id="school-stream-template">
+    <!-- FIXED BACKGROUND -->
+    <div class="stream-item bg-white border border-gray-200 p-3 rounded-md">
+
+        <div class="flex justify-between items-center mb-3">
+            <input type="text" class="input-base w-1/2"
+                placeholder="Stream Name (e.g., Science)" required>
         </div>
-    </template>
+
+        <div class="subjects-container space-y-2"></div>
+
+        <button type="button"
+            class="btn btn-secondary text-xs bg-[#f1f5f9] text-gray-800 hover:bg-[#e2e8f0]"
+            onclick="addSchoolSubject(this)">
+            + Add Subject
+        </button>
+
+    </div>
+</template>
+
+<template id="school-subject-template">
+    <div class="subject-item grid grid-cols-12 gap-2 items-center">
+
+        <input type="text" class="input-base col-span-2"
+            placeholder="Code" required>
+
+        <input type="text" class="input-base col-span-5"
+            placeholder="Subject Name" required>
+
+        <input type="number" class="input-base col-span-2"
+            placeholder="Hrs/Wk" required>
+
+        <!-- FIXED CHECKBOX -->
+        <label class="flex items-center justify-center gap-1 col-span-2 text-sm text-gray-700">
+            <input type="checkbox"
+                class="h-4 w-4 rounded border-gray-300 text-[#7091E6] focus:ring-[#7091E6]">
+            Elective
+        </label>
+
+    </div>
+</template>
     <!-- College Templates -->
     <template id="college-semester-template">
         <div class="semester-item glass-card p-4 rounded-lg">

@@ -429,82 +429,101 @@
 </div>
 
 <style>
-.label { display:block; margin-bottom:0.25rem; font-size:0.875rem; font-weight:500; color:#9ca3af; }
-.modal-backdrop { 
-    position:fixed; 
-    inset:0; 
-    z-index:50; 
-    display:flex; 
-    align-items:center; 
-    justify-content:center; 
-    background:rgba(0,0,0,0.7); 
-    backdrop-filter: blur(8px); 
-    animation: fadeIn 0.2s ease-out;
+
+/* ===== GLASS CARD FIX ===== */
+.glass-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
 }
+
+/* ===== TEXT FIX ===== */
+.text-white {
+    color: #111827 !important;
+}
+
+.text-gray-300 {
+    color: #374151 !important;
+}
+
+.text-gray-400 {
+    color: #6b7280 !important;
+}
+
+/* ===== TABLE FIX ===== */
+thead {
+    background: #EDE8F5 !important;
+}
+
+tbody {
+    background: #ffffff !important;
+}
+
+.divide-gray-700 > * {
+    border-color: #e5e7eb !important;
+}
+
+/* ===== HOVER FIX ===== */
+.hover\:bg-gray-800\/30:hover {
+    background: #f5f7ff !important;
+}
+
+/* ===== BOX FIX ===== */
+.bg-gray-800\/30 {
+    background: #f9fafb !important;
+}
+
+.bg-gray-900\/50 {
+    background: #f3f4f6 !important;
+}
+
+/* ===== MODAL FIX ===== */
 .modal-content { 
-    background-color:#111827; 
-    border:1px solid #374151; 
-    border-radius:1.5rem; 
-    box-shadow:0 25px 50px -12px rgba(0,0,0,0.5); 
-    width:100%; 
-    margin:0 1rem; 
-    animation: slideUp 0.3s ease-out;
-    max-height: 90vh;
-    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
 }
-.modal-header { 
-    display:flex; 
-    align-items:center; 
-    justify-content:space-between; 
-    padding:1.5rem; 
-    border-bottom:1px solid #374151; 
-}
+
 .modal-header h3 { 
-    font-size:1.25rem; 
-    font-weight:600; 
-    color:#fff; 
-}
-.modal-footer { 
-    display:flex; 
-    align-items:center; 
-    justify-content:flex-end; 
-    padding:1.5rem; 
-    border-top:1px solid #374151; 
-    gap:0.75rem; 
-    border-bottom-left-radius:1.5rem; 
-    border-bottom-right-radius:1.5rem; 
+    color: #111827;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.modal-header {
+    border-bottom: 1px solid #e5e7eb;
 }
 
-@keyframes slideUp {
-    from { 
-        opacity: 0;
-        transform: translateY(20px) scale(0.95);
-    }
-    to { 
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
+.modal-footer {
+    border-top: 1px solid #e5e7eb;
 }
 
-/* Custom scrollbar for modal content */
-.modal-content::-webkit-scrollbar {
-    width: 6px;
+/* ===== BUTTON FIX ===== */
+.btn-primary {
+    background: #7091E6;
 }
-.modal-content::-webkit-scrollbar-track {
-    background: transparent;
+
+.btn-primary:hover {
+    background: #3D52A0;
 }
+
+/* ===== INPUT FIX ===== */
+.input-base {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #111827;
+}
+
+.input-base:focus {
+    border-color: #7091E6;
+    box-shadow: 0 0 0 2px #EDE8F5;
+}
+
+/* ===== SCROLLBAR ===== */
 .modal-content::-webkit-scrollbar-thumb {
-    background: #4b5563;
-    border-radius: 3px;
+    background: #cbd5e1;
 }
+
 .modal-content::-webkit-scrollbar-thumb:hover {
-    background: #6b7280;
+    background: #94a3b8;
 }
+
 </style>
 {% endblock %}
 

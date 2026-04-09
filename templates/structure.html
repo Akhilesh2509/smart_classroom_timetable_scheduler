@@ -9,6 +9,106 @@
         <h2 class="text-2xl font-bold text-white">Manage Academic Structure</h2>
         <p class="text-sm text-gray-400">Organize your institution's core academic hierarchy.</p>
     </div>
+    <style>
+
+/* ===== CARD ===== */
+.glass-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+/* ===== TEXT FIX ===== */
+.text-white {
+    color: #111827 !important;
+}
+
+.text-gray-200 {
+    color: #111827 !important;
+}
+
+.text-gray-300 {
+    color: #374151 !important;
+}
+
+.text-gray-400 {
+    color: #6b7280 !important;
+}
+
+/* ===== INPUT ===== */
+.input-base {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #111827 !important;
+}
+
+.input-base:focus {
+    border-color: #7091E6 !important;
+    box-shadow: 0 0 0 2px #EDE8F5 !important;
+}
+
+/* ===== LIST ITEM ===== */
+.list-item {
+    background: #ffffff;
+}
+
+.list-item:hover {
+    background: #f5f7ff !important;
+}
+
+.list-item.active {
+    border-color: #7091E6 !important;
+    background: #EDE8F5 !important;
+}
+
+/* ===== SUB ITEMS ===== */
+.bg-gray-900\/30,
+.bg-gray-800\/80 {
+    background: #f9fafb !important;
+}
+
+/* ===== BUTTONS ===== */
+.btn-primary {
+    background: #7091E6;
+    color: white;
+}
+.btn-primary:hover {
+    background: #3D52A0;
+}
+
+.btn-secondary {
+    background: #e5e7eb;
+    color: #111827;
+}
+.btn-secondary:hover {
+    background: #d1d5db;
+}
+
+.btn-danger {
+    background: #ef4444;
+}
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+/* ===== ADD BUTTON FIX ===== */
+.bg-violet-600 {
+    background: #7091E6 !important;
+}
+.bg-violet-600:hover {
+    background: #3D52A0 !important;
+}
+
+/* ===== BORDER FIX ===== */
+.border-gray-700 {
+    border-color: #e5e7eb !important;
+}
+
+/* ===== MODAL ===== */
+.bg-black\/60 {
+    background: rgba(0,0,0,0.4) !important;
+}
+
+</style>
 {% endblock %}
 
 {% block content %}
@@ -149,6 +249,13 @@
 
 {% block scripts %}
 <script>
+function sortItems(data) {
+    return data.sort((a, b) => {
+        const numA = parseInt(a.name.replace(/\D/g, '')) || 0;
+        const numB = parseInt(b.name.replace(/\D/g, '')) || 0;
+        return numA - numB;
+    });
+}
 document.addEventListener('DOMContentLoaded', () => {
     const APP_MODE = '{{ g.app_mode }}';
     const API_BASE_URL = `/structure/api/${APP_MODE}`;
@@ -194,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadInitialData() {
         const data = await apiRequest('');
         if (data) {
-            currentData = data.items;
+            currentData = sortItems(data.items);
             renderList();
         }
     }

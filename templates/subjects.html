@@ -114,12 +114,86 @@
 </div>
 
 <style>
-.input-base { background-color: rgba(31, 41, 55, 0.5); border: 1px solid #4b5563; color: #d1d5db; padding: 0.5rem 0.75rem; border-radius: 0.5rem; width: 100%; transition: all 0.2s ease; }
-.input-base:focus { outline: none; box-shadow: 0 0 0 2px #111827, 0 0 0 4px #8b5cf6; border-color: #8b5cf6; }
-.input-base:disabled { background-color: rgba(31, 41, 55, 0.2); cursor: not-allowed; }
-.btn-primary { background-color: #7c3aed; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; } .btn-primary:hover { background-color: #8b5cf6; } .btn-primary:disabled { background-color: #4c1d95; color: #a78bfa; cursor: not-allowed; }
-.btn-secondary { background-color: #4b5563; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 500; transition: all 0.2s ease; } .btn-secondary:hover { background-color: #6b7280; }
-.btn-danger { background-color: #be123c; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.2s ease; } .btn-danger:hover { background-color: #e11d48; }
+/* ===== INPUT FIX (WHITE) ===== */
+.input-base {
+    background: #ffffff; /* white */
+    border: 1px solid #cbd5e1; /* soft border */
+    color: #111827; /* black text */
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    width: 100%;
+    transition: all 0.2s ease;
+}
+
+/* focus effect */
+.input-base:focus {
+    outline: none;
+    border-color: #7091E6;
+    box-shadow: 0 0 0 2px #EDE8F5;
+}
+
+/* disabled */
+.input-base:disabled {
+    background-color: #f1f5f9;
+    cursor: not-allowed;
+}
+
+/* dropdown fix */
+select option {
+    background: #ffffff;
+    color: #111827;
+}
+
+/* ===== PRIMARY BUTTON ===== */
+.btn-primary {
+    background-color: #7091E6; /* blue */
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-primary:hover {
+    background-color: #3D52A0;
+}
+
+.btn-primary:disabled {
+    background-color: #c7d2fe;
+    color: #64748b;
+    cursor: not-allowed;
+}
+
+/* ===== SECONDARY BUTTON ===== */
+.btn-secondary {
+    background-color: #e5e7eb;
+    color: #111827;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #d1d5db;
+}
+
+/* ===== DANGER BUTTON ===== */
+.btn-danger {
+    background-color: #ef4444;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+    background-color: #dc2626;
+}
 </style>
 {% endblock %}
 
@@ -197,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tableBody.innerHTML = '';
         items.forEach(item => {
             const row = tableBody.insertRow();
-            row.className = 'border-b border-gray-800 hover:bg-gray-800/50';
+            row.className = 'bg-[#EDE8F5]';
             const cells = APP_MODE === 'school' ? [
                 item.name, item.code, item.weekly_hours, item.is_elective ? 'Yes' : 'No'
             ] : [
@@ -358,4 +432,3 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 {% endblock %}
-

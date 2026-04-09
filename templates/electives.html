@@ -12,7 +12,7 @@
 {% block content %}
 <div id="app" class="space-y-6">
     <!-- Actions -->
-    <div class="bg-slate-900/50 p-4 rounded-xl flex justify-between items-center">
+    <div class="bg-white border border-gray-200 p-4 rounded-xl flex justify-between items-center">
         <div v-if="appMode === 'school'">
             <h3 class="text-lg font-semibold text-white">Elective Selection Window</h3>
             <p class="text-sm text-gray-400">Current Status: 
@@ -33,7 +33,7 @@
         <div class="glass-card rounded-xl p-5">
             <h3 class="text-xl font-bold text-white mb-4">Electives Summary</h3>
             <div v-if="electives.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div v-for="elective in electives" :key="elective.id" class="bg-gray-800/50 p-4 rounded-lg">
+                <div v-for="elective in electives" :key="elective.id" class="bg-white border border-gray-200 p-4 rounded-lg"">
                     <p class="font-semibold text-gray-200">${ elective.name } (${ elective.code })</p>
                     <p class="text-2xl font-bold text-purple-400">${ elective.student_count } <span class="text-base font-normal text-gray-400">students</span></p>
                 </div>
@@ -46,7 +46,7 @@
             <h3 class="text-xl font-bold text-white mb-4">Student Choices</h3>
              <div v-if="students.length > 0" class="overflow-x-auto">
                 <table class="w-full text-sm text-left text-gray-400">
-                    <thead class="text-xs text-gray-300 uppercase bg-gray-800/60">
+                    <thead class="text-xs text-gray-700 uppercase bg-[#EDE8F5]">
                         <tr>
                             <th scope="col" class="px-6 py-3">Student Name</th>
                             <th scope="col" class="px-6 py-3">Username</th>
@@ -54,7 +54,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="student in students" :key="student.id" class="border-b border-gray-700 hover:bg-slate-800/40">
+                        <tr v-for="student in students" :key="student.id" class="border-b border-gray-200 hover:bg-[#f5f7ff]"0">
                             <td class="px-6 py-4 font-medium text-white">${ student.full_name }</td>
                             <td class="px-6 py-4">${ student.username }</td>
                             <td class="px-6 py-4">
@@ -75,7 +75,17 @@
 </div>
 
 <style>
-.btn-primary { @apply px-4 py-2 font-semibold text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition disabled:bg-gray-600 disabled:cursor-not-allowed; }
+.btn-primary {
+    padding: 0.5rem 1rem;
+    background: #7091E6;
+    color: white;
+    border-radius: 0.5rem;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background: #3D52A0;
+}
 </style>
 {% endblock %}
 

@@ -5,6 +5,109 @@
 {% block header %}
 <h1 class="text-3xl font-bold text-gray-200">Exam Management</h1>
 <p class="text-gray-400 mt-1">Schedule exams and manage seating arrangements</p>
+<style>
+
+/* ===== CARD ===== */
+.glass-card {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+/* ===== TEXT FIX ===== */
+.text-gray-200,
+.text-gray-100 {
+    color: #111827 !important;
+}
+
+.text-gray-300 {
+    color: #374151 !important;
+}
+
+.text-gray-400 {
+    color: #6b7280 !important;
+}
+
+/* ===== SELECT ===== */
+select {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #111827 !important;
+}
+
+/* ===== INPUT ===== */
+input {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #111827 !important;
+}
+
+/* ===== TABLE ===== */
+thead {
+    background: #EDE8F5 !important;
+}
+
+[class*="bg-gray"] {
+    background: #ffffff !important;
+}
+
+[class*="border-gray"] {
+    border-color: #e5e7eb !important;
+}
+
+/* ===== ROW HOVER ===== */
+tr:hover {
+    background: #f5f7ff !important;
+}
+
+/* ===== BUTTON FIX ===== */
+.bg-blue-600 {
+    background: #7091E6 !important;
+}
+.bg-blue-600:hover {
+    background: #3D52A0 !important;
+}
+
+/* gradient buttons */
+.from-blue-500 {
+    --tw-gradient-from: #7091E6 !important;
+}
+.to-blue-600 {
+    --tw-gradient-to: #3D52A0 !important;
+}
+
+/* ===== MODAL ===== */
+.bg-gray-800 {
+    background: #ffffff !important;
+}
+
+.bg-black {
+    background: rgba(0,0,0,0.4) !important;
+}
+
+/* ===== TOAST ===== */
+#toast > div {
+    background: #ffffff !important;
+    border-left-color: #7091E6 !important;
+}
+/* ===== EXAMS TABLE TEXT FIX ===== */
+
+/* Header */
+#exams-container th {
+    color: #111827 !important;
+    font-weight: 600;
+}
+
+/* Main text */
+#exams-container td {
+    color: #111827 !important;
+}
+
+/* Secondary text (subject code, time etc) */
+#exams-container td div:last-child {
+    color: #374151 !important;
+}
+
+</style>
 {% endblock %}
 
 {% block content %}
@@ -306,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function loadExams() {
         showLoading();
         try {
-            const response = await fetch('/api/exams');
+            const response = await fetch('/exams/api/exams');
             if (response.ok) {
                 const data = await response.json();
                 exams = data.exams;
@@ -403,7 +506,9 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         try {
-            const url = isEditMode ? `/api/exams/${currentExamId}` : '/api/exams';
+            const url = isEditMode 
+            ? `/exams/api/exams/${currentExamId}` 
+            : '/exams/api/exams';
             const method = isEditMode ? 'PUT' : 'POST';
             
             const response = await fetch(url, {
@@ -664,7 +769,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.deleteExam = async function(examId) {
         if (confirm('Are you sure you want to delete this exam?')) {
             try {
-                const response = await fetch(`/api/exams/${examId}`, {
+                const response = await fetch(`/exams/api/exams/${examId}`, {
                     method: 'DELETE'
                 });
                 

@@ -9,152 +9,171 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
+body {
+    font-family: 'Inter', sans-serif;
+    background: #EDE8F5; /* soft premium bg */
+    color: #111827;
+}
 
-        .glass-card {
-            background: rgba(30, 41, 59, 0.4);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+/* ===== SIDEBAR PREMIUM ===== */
+.glass-sidebar {
+    background: linear-gradient(180deg, #3D52A0, #2c3b73);
+    border-right: 1px solid #2f3e7a;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.08);
+}
 
-        .glass-sidebar {
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(16px);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-        }
+/* LOGO */
+.glass-sidebar h1 {
+    color: #ffffff;
+    letter-spacing: 1px;
+}
 
-        .bg-gradient-body {
-            background-color: #020617;
-            background-image: radial-gradient(at 2% 5%, rgb(30, 27, 44) 0px, transparent 50%), radial-gradient(at 98% 98%, rgb(20, 32, 53) 0px, transparent 50%);
-        }
+/* NAV LINKS */
+.glass-sidebar a {
+    color: #dbeafe !important;
+    border-radius: 10px;
+    padding: 10px 12px;
+    transition: all 0.25s ease;
+}
 
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
+/* ICON */
+.glass-sidebar a svg {
+    color: #c7d2fe;
+    transition: all 0.25s ease;
+}
 
-        ::-webkit-scrollbar-track {
-            background: transparent;
-        }
+/* HOVER */
+.glass-sidebar a:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff !important;
+    transform: translateX(4px);
+}
 
-        ::-webkit-scrollbar-thumb {
-            background: #4b5563;
-            border-radius: 3px;
-        }
+.glass-sidebar a:hover svg {
+    color: #ffffff;
+}
 
-        .active-nav-link {
-            background-color: rgba(124, 58, 237, 0.3);
-            color: #c4b5fd;
-            font-weight: 600;
-        }
+/* ACTIVE LINK */
+.active-nav-link {
+    background: linear-gradient(135deg, #7091E6, #3D52A0) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
 
-        .active-nav-link svg {
-            color: #a78bfa;
-        }
+.active-nav-link svg {
+    color: #ffffff !important;
+}
 
-        /* Shared form controls */
-        .input-base {
-            background-color: rgba(31, 41, 55, 0.5);
-            border: 1px solid #4b5563;
-            color: #d1d5db;
-            padding: 0.5rem 0.75rem;
-            border-radius: 0.5rem;
-            width: 100%;
-            transition: all 0.2s ease;
-        }
+/* SIDEBAR SCROLL */
+.glass-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
 
-        .input-base:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px #111827, 0 0 0 4px #8b5cf6;
-            border-color: #8b5cf6;
-        }
+.glass-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+}
 
-        .input-base:disabled {
-            background-color: #111827;
-            color: #9ca3af;
-            cursor: not-allowed;
-        }
 
-        .btn-primary {
-            background-color: #7c3aed;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-            box-shadow: 0 10px 15px -3px rgba(88, 28, 135, 0.25);
-        }
+/* ===== CARDS ===== */
+.glass-card {
+    background: #ffffff;
+    border: 1px solid #ADB BDA;
+    border-radius: 12px;
+}
 
-        .btn-primary:hover {
-            background-color: #8b5cf6;
-        }
+/* hover effect */
+.glass-card:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
 
-        .btn-primary:disabled {
-            background-color: #6b7280;
-            cursor: not-allowed;
-        }
+/* ===== HEADER ===== */
+header {
+    background: #ffffff !important;
+    border-bottom: 1px solid #ADB BDA;
+}
 
-        .btn-secondary {
-            background-color: #4b5563;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            transition: all 0.2s ease;
-        }
+/* ===== TEXT ===== */
+.text-white {
+    color: #111827 !important;
+}
 
-        .btn-secondary:hover {
-            background-color: #6b7280;
-        }
+.text-gray-300,
+.text-gray-400 {
+    color: #8697C4 !important;
+}
 
-        /* Enhanced accessibility features */
-        .focus-visible:focus-visible {
-            outline: 2px solid #3b82f6;
-            outline-offset: 2px;
-        }
+/* ===== INPUT ===== */
+.input-base {
+    background: #ffffff;
+    border: 1px solid #ADB BDA;
+    color: #111827;
+}
 
-        .high-contrast {
-            filter: contrast(150%);
-        }
+/* ===== BUTTON ===== */
+.btn-primary {
+    background: #7091E6;
+    color: white;
+}
+.btn-primary:hover {
+    background: #3D52A0;
+}
 
-        .dyslexia-friendly {
-            font-family: 'Comic Sans MS', cursive;
-            letter-spacing: 0.1em;
-            line-height: 1.8;
-        }
+/* ===== TABLE ===== */
+thead {
+    background: #EDE8F5;
+    color: #3D52A0;
+}
 
-        .reduced-motion {
-            animation: none !important;
-            transition: none !important;
-        }
+tbody tr:hover {
+    background: #f5f7ff;
+}
 
-        .voice-active {
-            animation: pulse 1s infinite;
-            background: linear-gradient(45deg, #10b981, #059669);
-        }
+/* ===== REMOVE DARK BG ===== */
+.bg-gray-900,
+.bg-gray-800,
+.bg-gray-700 {
+    background: transparent !important;
+}
 
-        .skeleton {
-            background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
+/* ===== ACCESSIBILITY PANEL FIX ===== */
+#accessibility-panel .glass-card {
+    background: #ffffff !important;
+    color: #111827 !important;
+}
 
-        @keyframes loading {
-            0% {
-                background-position: 200% 0;
-            }
+#accessibility-panel h3 {
+    color: #111827 !important;
+}
 
-            100% {
-                background-position: -200% 0;
-            }
-        }
+#accessibility-panel button {
+    color: #374151 !important;
+}
 
-        /* Smooth transitions */
-        * {
-            transition: all 0.3s ease;
-        }
-    </style>
+#accessibility-panel button:hover {
+    background: #EDE8F5 !important;
+}
+
+/* ===== SMOOTH ===== */
+* {
+    transition: all 0.2s ease;
+}
+#user-menu {
+    animation: dropdownFade 0.2s ease;
+}
+
+@keyframes dropdownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
 </head>
 
 <body class="bg-gradient-body text-gray-200">
@@ -346,7 +365,7 @@
                     <button id="user-menu-button"
                         class="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-700 focus-visible"
                         aria-label="User menu">
-                        <span class="text-gray-300 hidden sm:block font-medium">{{ session.username }}</span>
+                        <span class="text-gray-900 hidden sm:block font-semibold tracking-wide">{{ session.username }}</span>
                         <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
                                 d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
@@ -354,15 +373,26 @@
                         </svg>
                     </button>
                     <div id="user-menu"
-                        class="hidden absolute right-0 mt-2 w-48 bg-gray-800 rounded-md shadow-lg py-1 z-20">
-                        <div class="px-4 py-2 text-xs text-gray-400 border-b border-gray-700">
-                            {{ session.role|capitalize }}
-                        </div>
-                        <a href="{{ url_for('main.logout') }}"
-                            class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700">
-                            Logout
-                        </a>
-                    </div>
+    class="hidden absolute right-0 top-full mt-3 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-[9999]">
+
+    <!-- USER ROLE -->
+    <div class="px-4 py-2 text-xs text-gray-500 border-b border-gray-200">
+        {{ session.role|capitalize }}
+    </div>
+
+    <!-- LOGOUT -->
+    <a href="{{ url_for('main.logout') }}"
+        class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
+
+        <!-- ICON -->
+        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1m0-10V7"></path>
+        </svg>
+
+        Logout
+    </a>
+</div>
                 </div>
                 {% endif %}
             </header>
@@ -513,20 +543,69 @@
 
             // Voice command handler
             function handleVoiceCommand(command) {
-                if (command.includes('dashboard')) {
-                    window.location.href = '/dashboard';
-                } else if (command.includes('timetable')) {
-                    window.location.href = '/timetable';
-                } else if (command.includes('teachers')) {
-                    window.location.href = '/staff';
-                } else if (command.includes('students')) {
-                    window.location.href = '/sections';
-                } else if (command.includes('exams')) {
-                    window.location.href = '/exams';
-                } else if (command.includes('logout')) {
-                    window.location.href = '/logout';
-                }
-            }
+
+    console.log("Voice:", command);
+
+    command = command.toLowerCase().trim();
+
+    // 🔥 REMOVE EXTRA WORDS
+    command = command
+        .replace("go to", "")
+        .replace("open", "")
+        .replace("show", "")
+        .replace("please", "")
+        .trim();
+
+    console.log("Cleaned:", command);
+
+    // DASHBOARD
+    if (command.includes('dashboard') || command.includes('home')) {
+        window.location.href = '/dashboard';
+    }
+
+    // TIMETABLE
+    else if (command.includes('timetable') || command.includes('schedule')) {
+        window.location.href = '/timetable';
+    }
+
+    // CLASSROOMS 🔥 (FIXED)
+    else if (
+        command.includes('classroom') ||
+        command.includes('class room') ||
+        command.includes('classrooms')
+    ) {
+        window.location.href = '/classrooms';
+    }
+
+    // TEACHERS
+    else if (command.includes('teacher') || command.includes('staff')) {
+        window.location.href = '/staff';
+    }
+
+    // STUDENTS
+    else if (command.includes('student') || command.includes('section')) {
+        window.location.href = '/sections';
+    }
+
+    // EXAMS
+    else if (command.includes('exam')) {
+        window.location.href = '/exams';
+    }
+
+    // LOGOUT
+    else if (
+        command.includes('logout') ||
+        command.includes('log out') ||
+        command.includes('sign out')
+    ) {
+        window.location.href = '/logout';
+    }
+
+    // UNKNOWN
+    else {
+        showToast("Command not recognized: " + command, "error");
+    }
+}
 
             // Helper function to update accessibility indicators
             function updateAccessibilityIndicator(indicatorId, isEnabled) {

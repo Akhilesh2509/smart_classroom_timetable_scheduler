@@ -284,7 +284,7 @@ def create_realistic_data():
     
     # Create users and teachers
     teachers = []
-    for i in range(15):  # 20 teachers
+    for i in range(60):  # 60 teachers
         user = User(
             username=f"teacher{i+1:02d}",
             email=f"teacher{i+1:02d}@adypu.edu.in",
@@ -325,7 +325,7 @@ def create_realistic_data():
     
     # Create students
     students = []
-    for i in range(120):  # 120 students
+    for i in range(600):  # 600 students
         user = User(
             username=f"student{i+1:03d}",
             email=f"student{i+1:03d}@adypu.edu.in",
