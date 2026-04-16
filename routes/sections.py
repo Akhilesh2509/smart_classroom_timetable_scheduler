@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, request, session, redirect, url_for, rende
 from sqlalchemy import exc
 
 from extensions import db
-from models import User, Student, StudentSection, Semester, Department, Course, Subject
+from models import User, Student, StudentSection, Semester, Department, Course, Subject, SchoolGroup
 from utils import hash_password, generate_random_password, log_activity
 
 sections_bp = Blueprint('sections', __name__)
@@ -70,7 +70,28 @@ def manage_sections():
         return redirect(url_for('main.login'))
     if session.get('role') != 'admin':
         return redirect(url_for('main.dashboard'))
-    return render_template('sections.html')
+
+    initial_primary_data = []
+    if g.app_mode == 'school':
+        groups = SchoolGroup.query.options(
+            db.joinedload(SchoolGroup.grades),
+            db.joinedload(SchoolGroup.streams)
+        ).all()
+        initial_primary_data = [{
+            "id": group.id,
+            "name": group.name,
+            "grades": [{"id": grade.id, "name": grade.name} for grade in group.grades],
+            "streams": [{"id": stream.id, "name": stream.name} for stream in group.streams]
+        } for group in groups]
+    else:
+        semesters = Semester.query.options(db.joinedload(Semester.departments)).all()
+        initial_primary_data = [{
+            "id": semester.id,
+            "name": semester.name,
+            "departments": [{"id": dept.id, "name": dept.name} for dept in semester.departments]
+        } for semester in semesters]
+
+    return render_template('sections.html', initial_primary_data=initial_primary_data)
 
 @sections_bp.route('/api/sections', methods=['GET', 'POST'])
 @sections_bp.route('/api/sections/<int:section_id>', methods=['PUT', 'DELETE'])

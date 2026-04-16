@@ -1,113 +1,228 @@
 {% extends "base.html" %}
 
 {% block title %}
-    Manage {{ 'School Structure' if g.app_mode == 'school' else 'Academic Structure' }}
+Manage {{ 'School Structure' if g.app_mode == 'school' else 'Academic Structure' }}
 {% endblock %}
 
 {% block header %}
-    <div class="flex-grow">
-        <h2 class="text-2xl font-bold text-white">Manage Academic Structure</h2>
-        <p class="text-sm text-gray-400">Organize your institution's core academic hierarchy.</p>
-    </div>
-    <style>
+<div class="flex-grow">
+    <h2 class="text-2xl font-bold text-white">Manage Academic Structure</h2>
+    <p class="text-sm text-gray-400">Organize your institution's core academic hierarchy.</p>
+</div>
+<style>
+    /* ===================================================== */
+    /* ☀️ LIGHT MODE (DEFAULT) */
+    /* ===================================================== */
 
-/* ===== CARD ===== */
-.glass-card {
-    background: #ffffff !important;
-    border: 1px solid #e5e7eb !important;
-}
+    /* CARD */
+    .glass-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+    }
 
-/* ===== TEXT FIX ===== */
-.text-white {
-    color: #111827 !important;
-}
+    /* TEXT */
+    .text-gray-200 {
+        color: #111827;
+    }
 
-.text-gray-200 {
-    color: #111827 !important;
-}
+    .text-gray-300 {
+        color: #374151;
+    }
 
-.text-gray-300 {
-    color: #374151 !important;
-}
+    .text-gray-400 {
+        color: #6b7280;
+    }
 
-.text-gray-400 {
-    color: #6b7280 !important;
-}
+    /* INPUT */
+    .input-base {
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #111827;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        width: 100%;
+        transition: all 0.2s ease;
+    }
 
-/* ===== INPUT ===== */
-.input-base {
-    background: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
-    color: #111827 !important;
-}
+    .input-base:focus {
+        border-color: #7091E6;
+        box-shadow: 0 0 0 2px #EDE8F5;
+        outline: none;
+    }
 
-.input-base:focus {
-    border-color: #7091E6 !important;
-    box-shadow: 0 0 0 2px #EDE8F5 !important;
-}
+    /* LIST ITEM */
+    .list-item {
+        background: #ffffff;
+        transition: all 0.2s ease;
+    }
 
-/* ===== LIST ITEM ===== */
-.list-item {
-    background: #ffffff;
-}
+    .list-item:hover {
+        background: #f5f7ff;
+    }
 
-.list-item:hover {
-    background: #f5f7ff !important;
-}
+    .list-item.active {
+        border-color: #7091E6;
+        background: #EDE8F5;
+    }
 
-.list-item.active {
-    border-color: #7091E6 !important;
-    background: #EDE8F5 !important;
-}
+    /* SUB ITEMS */
+    .bg-gray-900\/30,
+    .bg-gray-800\/80 {
+        background: #f9fafb;
+    }
 
-/* ===== SUB ITEMS ===== */
-.bg-gray-900\/30,
-.bg-gray-800\/80 {
-    background: #f9fafb !important;
-}
+    /* BUTTONS */
+    .btn-primary {
+        background: #7091E6;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+    }
 
-/* ===== BUTTONS ===== */
-.btn-primary {
-    background: #7091E6;
-    color: white;
-}
-.btn-primary:hover {
-    background: #3D52A0;
-}
+    .btn-primary:hover {
+        background: #3D52A0;
+    }
 
-.btn-secondary {
-    background: #e5e7eb;
-    color: #111827;
-}
-.btn-secondary:hover {
-    background: #d1d5db;
-}
+    .btn-secondary {
+        background: #e5e7eb;
+        color: #111827;
+        padding: 0.4rem 0.8rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+    }
 
-.btn-danger {
-    background: #ef4444;
-}
-.btn-danger:hover {
-    background: #dc2626;
-}
+    .btn-secondary:hover {
+        background: #d1d5db;
+    }
 
-/* ===== ADD BUTTON FIX ===== */
-.bg-violet-600 {
-    background: #7091E6 !important;
-}
-.bg-violet-600:hover {
-    background: #3D52A0 !important;
-}
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 600;
+    }
 
-/* ===== BORDER FIX ===== */
-.border-gray-700 {
-    border-color: #e5e7eb !important;
-}
+    .btn-danger:hover {
+        background: #dc2626;
+    }
 
-/* ===== MODAL ===== */
-.bg-black\/60 {
-    background: rgba(0,0,0,0.4) !important;
-}
+    /* ADD BUTTON */
+    .bg-violet-600 {
+        background: #7091E6;
+    }
 
+    .bg-violet-600:hover {
+        background: #3D52A0;
+    }
+
+    /* BORDER */
+    .border-gray-700 {
+        border-color: #e5e7eb;
+    }
+
+    /* MODAL */
+    .bg-black\/60 {
+        background: rgba(0, 0, 0, 0.4);
+    }
+
+
+    /* ===================================================== */
+    /* 🌙 DARK MODE */
+    /* ===================================================== */
+
+    /* CARD */
+    .dark .glass-card {
+        background: #1e293b !important;
+        border: 1px solid #334155 !important;
+    }
+
+    /* TEXT */
+    .dark .text-gray-200 {
+        color: #f1f5f9 !important;
+    }
+
+    .dark .text-gray-300 {
+        color: #cbd5f5 !important;
+    }
+
+    .dark .text-gray-400 {
+        color: #94a3b8 !important;
+    }
+
+    /* INPUT */
+    .dark .input-base {
+        background: #0f172a !important;
+        border: 1px solid #334155 !important;
+        color: #e5e7eb !important;
+    }
+
+    .dark .input-base:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3) !important;
+    }
+
+    /* LIST ITEM */
+    .dark .list-item {
+        background: #1e293b !important;
+    }
+
+    .dark .list-item:hover {
+        background: #334155 !important;
+    }
+
+    .dark .list-item.active {
+        background: rgba(59, 130, 246, 0.2) !important;
+        border-color: #3b82f6 !important;
+    }
+
+    /* SUB ITEMS */
+    .dark .bg-gray-900\/30,
+    .dark .bg-gray-800\/80 {
+        background: #0f172a !important;
+    }
+
+    /* BUTTONS */
+    .dark .btn-primary {
+        background: #3b82f6 !important;
+    }
+
+    .dark .btn-secondary {
+        background: #334155 !important;
+        color: #e5e7eb !important;
+    }
+
+    .dark .btn-secondary:hover {
+        background: #475569 !important;
+    }
+
+    .dark .btn-danger {
+        background: #dc2626 !important;
+    }
+
+    .dark .btn-danger:hover {
+        background: #b91c1c !important;
+    }
+
+    /* ADD BUTTON */
+    .dark .bg-violet-600 {
+        background: #3b82f6 !important;
+    }
+
+    .dark .bg-violet-600:hover {
+        background: #2563eb !important;
+    }
+
+    /* BORDER */
+    .dark .border-gray-700 {
+        border-color: #334155 !important;
+    }
+
+    /* MODAL */
+    .dark .bg-black\/60 {
+        background: rgba(0, 0, 0, 0.6) !important;
+    }
 </style>
 {% endblock %}
 
@@ -119,8 +234,13 @@
             <h3 class="text-lg font-semibold text-white">
                 {{ 'School Groups' if g.app_mode == 'school' else 'Semesters' }}
             </h3>
-            <button id="add-main-btn" class="bg-violet-600 hover:bg-violet-500 text-white font-semibold p-2 rounded-lg transition-colors inline-flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <button id="add-main-btn"
+                class="bg-violet-600 hover:bg-violet-500 text-white font-semibold p-2 rounded-lg transition-colors inline-flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
             </button>
         </div>
         <div id="structure-list" class="flex-grow overflow-y-auto pr-2 space-y-2">
@@ -132,8 +252,10 @@
     <!-- Right Pane: Details and Forms -->
     <div id="details-pane" class="w-2/3 glass-card rounded-2xl p-6 flex items-center justify-center">
         <div id="placeholder-view" class="text-center">
-            <svg class="mx-auto h-12 w-12 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+            <svg class="mx-auto h-12 w-12 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                aria-hidden="true">
+                <path vector-effect="non-scaling-stroke" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
             </svg>
             <h3 class="mt-2 text-sm font-semibold text-gray-300">Select an item to view details</h3>
             <p class="mt-1 text-sm text-gray-500">Or, create a new one to get started.</p>
@@ -147,11 +269,22 @@
 <!-- ====== TEMPLATES ====== -->
 <!-- List Item Template -->
 <template id="list-item-template">
-    <div class="list-item group flex justify-between items-center p-3 rounded-lg cursor-pointer border-2 border-transparent hover:bg-gray-700/50 transition-colors">
+    <div
+        class="list-item group flex justify-between items-center p-3 rounded-lg cursor-pointer border-2 border-transparent hover:bg-gray-700/50 transition-colors">
         <span class="font-semibold text-gray-200 item-name"></span>
         <div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-x-2">
-            <button class="edit-btn text-gray-400 hover:text-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-            <button class="delete-btn text-red-500 hover:text-red-400"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+            <button class="edit-btn text-gray-400 hover:text-white"><svg xmlns="http://www.w3.org/2000/svg" width="16"
+                    height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg></button>
+            <button class="delete-btn text-red-500 hover:text-red-400"><svg xmlns="http://www.w3.org/2000/svg"
+                    width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg></button>
         </div>
     </div>
 </template>
@@ -173,7 +306,8 @@
                     <h4 class="font-semibold text-purple-300">Grades</h4>
                     <button type="button" class="add-grade-btn btn-secondary text-xs">+ Add</button>
                 </div>
-                <div class="grades-container flex-grow overflow-y-auto space-y-2 pr-2 bg-gray-900/30 p-2 rounded-md"></div>
+                <div class="grades-container flex-grow overflow-y-auto space-y-2 pr-2 bg-gray-900/30 p-2 rounded-md">
+                </div>
             </div>
             <!-- Streams -->
             <div class="flex flex-col min-h-0">
@@ -181,10 +315,11 @@
                     <h4 class="font-semibold text-purple-300">Streams</h4>
                     <button type="button" class="add-stream-btn btn-secondary text-xs">+ Add</button>
                 </div>
-                <div class="streams-container flex-grow overflow-y-auto space-y-2 pr-2 bg-gray-900/30 p-2 rounded-md"></div>
+                <div class="streams-container flex-grow overflow-y-auto space-y-2 pr-2 bg-gray-900/30 p-2 rounded-md">
+                </div>
             </div>
         </div>
-        
+
         <div class="flex-shrink-0 flex justify-end gap-x-3 pt-4 border-t border-gray-700">
             <button type="button" class="cancel-btn btn-secondary">Cancel</button>
             <button type="submit" class="save-btn btn-primary">Save Changes</button>
@@ -195,15 +330,19 @@
 <template id="sub-item-template">
     <div class="sub-item flex items-center gap-x-2 bg-gray-800/80 p-2 rounded-md">
         <input type="text" name="name" class="input-base text-sm flex-grow" required>
-        <button type="button" class="remove-sub-item-btn text-red-500 hover:text-red-400 p-1 rounded-full hover:bg-red-500/20">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"/></svg>
+        <button type="button"
+            class="remove-sub-item-btn text-red-500 hover:text-red-400 p-1 rounded-full hover:bg-red-500/20">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24">
+                <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M18 6L6 18M6 6l12 12" />
+            </svg>
         </button>
     </div>
 </template>
 
 <!-- College Form Template -->
 <template id="college-form-template">
-     <form class="flex flex-col h-full space-y-4" onsubmit="return false;">
+    <form class="flex flex-col h-full space-y-4" onsubmit="return false;">
         <h2 class="text-2xl font-bold text-white form-title"></h2>
         <input type="hidden" name="id">
         <div>
@@ -215,7 +354,8 @@
                 <h4 class="font-semibold text-purple-300">Departments</h4>
                 <button type="button" class="add-dept-btn btn-secondary text-xs">+ Add</button>
             </div>
-            <div class="departments-container flex-grow overflow-y-auto space-y-2 pr-2 bg-gray-900/30 p-2 rounded-md"></div>
+            <div class="departments-container flex-grow overflow-y-auto space-y-2 pr-2 bg-gray-900/30 p-2 rounded-md">
+            </div>
         </div>
         <div class="flex-shrink-0 flex justify-end gap-x-3 pt-4 border-t border-gray-700">
             <button type="button" class="cancel-btn btn-secondary">Cancel</button>
@@ -225,7 +365,9 @@
 </template>
 
 <!-- Custom Modal/Toast for notifications -->
-<div id="toast" class="fixed top-5 right-5 bg-green-600 text-white py-2 px-5 rounded-lg shadow-lg text-sm transition-transform translate-x-[120%]" role="alert"></div>
+<div id="toast"
+    class="fixed top-5 right-5 bg-green-600 text-white py-2 px-5 rounded-lg shadow-lg text-sm transition-transform translate-x-[120%]"
+    role="alert"></div>
 <div id="confirm-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
     <div class="glass-card rounded-lg p-6 w-full max-w-sm text-center">
         <h3 class="text-lg font-bold text-white mb-2">Are you sure?</h3>
@@ -236,251 +378,241 @@
         </div>
     </div>
 </div>
-
-<style>
-.input-base { background-color: rgba(31, 41, 55, 0.5); border: 1px solid #4b5563; color: #d1d5db; padding: 0.5rem 0.75rem; border-radius: 0.5rem; width: 100%; transition: all 0.2s ease; }
-.input-base:focus { outline: none; box-shadow: 0 0 0 2px #111827, 0 0 0 4px #8b5cf6; border-color: #8b5cf6; }
-.btn-primary { background-color: #7c3aed; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.2s ease; } .btn-primary:hover { background-color: #8b5cf6; }
-.btn-secondary { background-color: #4b5563; color: white; padding: 0.4rem 0.8rem; border-radius: 0.5rem; font-weight: 500; transition: all 0.2s ease; } .btn-secondary:hover { background-color: #6b7280; }
-.btn-danger { background-color: #be123c; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.2s ease; } .btn-danger:hover { background-color: #e11d48; }
-.list-item.active { border-color: #8b5cf6; background-color: rgba(124, 58, 237, 0.2); }
-</style>
 {% endblock %}
 
 {% block scripts %}
 <script>
-function sortItems(data) {
-    return data.sort((a, b) => {
-        const numA = parseInt(a.name.replace(/\D/g, '')) || 0;
-        const numB = parseInt(b.name.replace(/\D/g, '')) || 0;
-        return numA - numB;
-    });
-}
-document.addEventListener('DOMContentLoaded', () => {
-    const APP_MODE = '{{ g.app_mode }}';
-    const API_BASE_URL = `/structure/api/${APP_MODE}`;
-
-    // --- Element References ---
-    const structureList = document.getElementById('structure-list');
-    const detailsPane = document.getElementById('details-pane');
-    const placeholderView = document.getElementById('placeholder-view');
-    const formView = document.getElementById('form-view');
-    const addMainBtn = document.getElementById('add-main-btn');
-
-    const toast = document.getElementById('toast');
-    const confirmModal = document.getElementById('confirm-modal');
-    const confirmText = document.getElementById('confirm-text');
-    const confirmDeleteBtn = document.getElementById('confirm-delete');
-    const confirmCancelBtn = document.getElementById('confirm-cancel');
-
-    // --- State ---
-    let currentData = [];
-    let activeId = null;
-
-    // --- API & Data Functions ---
-    async function apiRequest(endpoint, method = 'GET', body = null) {
-        try {
-            const options = {
-                method,
-                headers: { 'Content-Type': 'application/json' }
-            };
-            if (body) options.body = JSON.stringify(body);
-            const response = await fetch(API_BASE_URL + endpoint, options);
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        } catch (error) {
-            console.error('API Request Error:', error);
-            showToast(`Error: ${error.message}`, 'error');
-            return null;
-        }
-    }
-
-    async function loadInitialData() {
-        const data = await apiRequest('');
-        if (data) {
-            currentData = sortItems(data.items);
-            renderList();
-        }
-    }
-
-    // --- Rendering Functions ---
-    function renderList() {
-        structureList.innerHTML = '';
-        if (currentData.length === 0) {
-            structureList.innerHTML = `<p class="text-center text-gray-500 pt-8">No items found. Add one to begin.</p>`;
-            return;
-        }
-        currentData.forEach(item => {
-            const template = document.getElementById('list-item-template').content.cloneNode(true);
-            const listItem = template.querySelector('.list-item');
-            listItem.dataset.id = item.id;
-            listItem.querySelector('.item-name').textContent = item.name;
-
-            if (item.id === activeId) {
-                listItem.classList.add('active');
-            }
-
-            listItem.addEventListener('click', () => showDetailsForm(item.id));
-            listItem.querySelector('.edit-btn').addEventListener('click', (e) => { e.stopPropagation(); showDetailsForm(item.id); });
-            listItem.querySelector('.delete-btn').addEventListener('click', (e) => { e.stopPropagation(); confirmDeletion(item.id, item.name); });
-            
-            structureList.appendChild(template);
+    function sortItems(data) {
+        return data.sort((a, b) => {
+            const numA = parseInt(a.name.replace(/\D/g, '')) || 0;
+            const numB = parseInt(b.name.replace(/\D/g, '')) || 0;
+            return numA - numB;
         });
     }
+    document.addEventListener('DOMContentLoaded', () => {
+        const APP_MODE = '{{ g.app_mode }}';
+        const API_BASE_URL = `/structure/api/${APP_MODE}`;
 
-    function showDetailsForm(id) {
-        const item = currentData.find(d => d.id === id);
-        if (!item) return;
-        
-        activeId = id;
-        renderList();
-        
-        const formTemplateId = APP_MODE === 'school' ? 'school-form-template' : 'college-form-template';
-        const template = document.getElementById(formTemplateId).content.cloneNode(true);
-        
-        const form = template.querySelector('form');
-        form.querySelector('.form-title').textContent = `Editing: ${item.name}`;
-        form.querySelector('[name="id"]').value = item.id;
-        form.querySelector('[name="name"]').value = item.name;
+        // --- Element References ---
+        const structureList = document.getElementById('structure-list');
+        const detailsPane = document.getElementById('details-pane');
+        const placeholderView = document.getElementById('placeholder-view');
+        const formView = document.getElementById('form-view');
+        const addMainBtn = document.getElementById('add-main-btn');
 
-        // Populate sub-items
-        if (APP_MODE === 'school') {
-            const gradesContainer = form.querySelector('.grades-container');
-            const streamsContainer = form.querySelector('.streams-container');
-            item.grades.forEach(grade => addSubItem(gradesContainer, 'grade', grade));
-            item.streams.forEach(stream => addSubItem(streamsContainer, 'stream', stream));
-        } else {
-            const deptsContainer = form.querySelector('.departments-container');
-            item.departments.forEach(dept => addSubItem(deptsContainer, 'department', dept));
+        const toast = document.getElementById('toast');
+        const confirmModal = document.getElementById('confirm-modal');
+        const confirmText = document.getElementById('confirm-text');
+        const confirmDeleteBtn = document.getElementById('confirm-delete');
+        const confirmCancelBtn = document.getElementById('confirm-cancel');
+
+        // --- State ---
+        let currentData = [];
+        let activeId = null;
+
+        // --- API & Data Functions ---
+        async function apiRequest(endpoint, method = 'GET', body = null) {
+            try {
+                const options = {
+                    method,
+                    headers: { 'Content-Type': 'application/json' }
+                };
+                if (body) options.body = JSON.stringify(body);
+                const response = await fetch(API_BASE_URL + endpoint, options);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            } catch (error) {
+                console.error('API Request Error:', error);
+                showToast(`Error: ${error.message}`, 'error');
+                return null;
+            }
         }
 
-        formView.innerHTML = '';
-        formView.appendChild(template);
-        attachFormListeners(formView.querySelector('form'));
-        
-        placeholderView.classList.add('hidden');
-        formView.classList.remove('hidden');
-    }
+        async function loadInitialData() {
+            const data = await apiRequest('');
+            if (data) {
+                currentData = sortItems(data.items);
+                renderList();
+            }
+        }
 
-    function showNewForm() {
-        activeId = null;
-        renderList();
-        const formTemplateId = APP_MODE === 'school' ? 'school-form-template' : 'college-form-template';
-        const template = document.getElementById(formTemplateId).content.cloneNode(true);
-        template.querySelector('.form-title').textContent = APP_MODE === 'school' ? 'Create New Group' : 'Create New Semester';
-        formView.innerHTML = '';
-        formView.appendChild(template);
-        attachFormListeners(formView.querySelector('form'));
-        placeholderView.classList.add('hidden');
-        formView.classList.remove('hidden');
-    }
-    
-    function showPlaceholder() {
-        activeId = null;
-        renderList();
-        placeholderView.classList.remove('hidden');
-        formView.classList.add('hidden');
-    }
+        // --- Rendering Functions ---
+        function renderList() {
+            structureList.innerHTML = '';
+            if (currentData.length === 0) {
+                structureList.innerHTML = `<p class="text-center text-gray-500 pt-8">No items found. Add one to begin.</p>`;
+                return;
+            }
+            currentData.forEach(item => {
+                const template = document.getElementById('list-item-template').content.cloneNode(true);
+                const listItem = template.querySelector('.list-item');
+                listItem.dataset.id = item.id;
+                listItem.querySelector('.item-name').textContent = item.name;
 
-    function addSubItem(container, type, data = { id: null, name: '' }) {
-        const template = document.getElementById('sub-item-template').content.cloneNode(true);
-        const subItem = template.querySelector('.sub-item');
-        subItem.dataset.id = data.id || `new-${Date.now()}`;
-        subItem.dataset.type = type;
-        const input = subItem.querySelector('input');
-        input.value = data.name;
-        input.placeholder = `New ${type} name...`;
-        subItem.querySelector('.remove-sub-item-btn').addEventListener('click', () => subItem.remove());
-        container.appendChild(template);
-    }
-    
-    // --- Event Listeners ---
-    addMainBtn.addEventListener('click', showNewForm);
+                if (item.id === activeId) {
+                    listItem.classList.add('active');
+                }
 
-    function attachFormListeners(form) {
-        form.querySelector('.save-btn').addEventListener('click', () => saveForm(form));
-        form.querySelector('.cancel-btn').addEventListener('click', showPlaceholder);
+                listItem.addEventListener('click', () => showDetailsForm(item.id));
+                listItem.querySelector('.edit-btn').addEventListener('click', (e) => { e.stopPropagation(); showDetailsForm(item.id); });
+                listItem.querySelector('.delete-btn').addEventListener('click', (e) => { e.stopPropagation(); confirmDeletion(item.id, item.name); });
 
-        if (APP_MODE === 'school') {
-            form.querySelector('.add-grade-btn').addEventListener('click', (e) => {
-                addSubItem(e.target.closest('div').nextElementSibling, 'grade');
-            });
-            form.querySelector('.add-stream-btn').addEventListener('click', (e) => {
-                addSubItem(e.target.closest('div').nextElementSibling, 'stream');
-            });
-        } else {
-            form.querySelector('.add-dept-btn').addEventListener('click', (e) => {
-                addSubItem(e.target.closest('div').nextElementSibling, 'department');
+                structureList.appendChild(template);
             });
         }
-    }
 
-    // --- Actions ---
-    async function saveForm(form) {
-        const id = form.querySelector('[name="id"]').value;
-        const name = form.querySelector('[name="name"]').value;
-        if (!name) {
-            showToast('Main name cannot be empty.', 'error');
-            return;
+        function showDetailsForm(id) {
+            const item = currentData.find(d => d.id === id);
+            if (!item) return;
+
+            activeId = id;
+            renderList();
+
+            const formTemplateId = APP_MODE === 'school' ? 'school-form-template' : 'college-form-template';
+            const template = document.getElementById(formTemplateId).content.cloneNode(true);
+
+            const form = template.querySelector('form');
+            form.querySelector('.form-title').textContent = `Editing: ${item.name}`;
+            form.querySelector('[name="id"]').value = item.id;
+            form.querySelector('[name="name"]').value = item.name;
+
+            // Populate sub-items
+            if (APP_MODE === 'school') {
+                const gradesContainer = form.querySelector('.grades-container');
+                const streamsContainer = form.querySelector('.streams-container');
+                item.grades.forEach(grade => addSubItem(gradesContainer, 'grade', grade));
+                item.streams.forEach(stream => addSubItem(streamsContainer, 'stream', stream));
+            } else {
+                const deptsContainer = form.querySelector('.departments-container');
+                item.departments.forEach(dept => addSubItem(deptsContainer, 'department', dept));
+            }
+
+            formView.innerHTML = '';
+            formView.appendChild(template);
+            attachFormListeners(formView.querySelector('form'));
+
+            placeholderView.classList.add('hidden');
+            formView.classList.remove('hidden');
         }
 
-        let payload = { id: id || null, name };
-        
-        if (APP_MODE === 'school') {
-            payload.grades = Array.from(form.querySelectorAll('.grades-container .sub-item')).map(el => ({ id: el.dataset.id.startsWith('new-') ? null : el.dataset.id, name: el.querySelector('input').value }));
-            payload.streams = Array.from(form.querySelectorAll('.streams-container .sub-item')).map(el => ({ id: el.dataset.id.startsWith('new-') ? null : el.dataset.id, name: el.querySelector('input').value }));
-        } else {
-            payload.departments = Array.from(form.querySelectorAll('.departments-container .sub-item')).map(el => ({ id: el.dataset.id.startsWith('new-') ? null : el.dataset.id, name: el.querySelector('input').value }));
+        function showNewForm() {
+            activeId = null;
+            renderList();
+            const formTemplateId = APP_MODE === 'school' ? 'school-form-template' : 'college-form-template';
+            const template = document.getElementById(formTemplateId).content.cloneNode(true);
+            template.querySelector('.form-title').textContent = APP_MODE === 'school' ? 'Create New Group' : 'Create New Semester';
+            formView.innerHTML = '';
+            formView.appendChild(template);
+            attachFormListeners(formView.querySelector('form'));
+            placeholderView.classList.add('hidden');
+            formView.classList.remove('hidden');
         }
 
-        const result = await apiRequest(id ? `/${id}` : '', id ? 'PUT' : 'POST', payload);
-        if (result) {
-            showToast(result.message, 'success');
-            showPlaceholder();
-            loadInitialData();
+        function showPlaceholder() {
+            activeId = null;
+            renderList();
+            placeholderView.classList.remove('hidden');
+            formView.classList.add('hidden');
         }
-    }
 
-    function confirmDeletion(id, name) {
-        confirmText.textContent = `This will permanently delete "${name}" and all its associated data. This action cannot be undone.`;
-        confirmModal.classList.remove('hidden');
+        function addSubItem(container, type, data = { id: null, name: '' }) {
+            const template = document.getElementById('sub-item-template').content.cloneNode(true);
+            const subItem = template.querySelector('.sub-item');
+            subItem.dataset.id = data.id || `new-${Date.now()}`;
+            subItem.dataset.type = type;
+            const input = subItem.querySelector('input');
+            input.value = data.name;
+            input.placeholder = `New ${type} name...`;
+            subItem.querySelector('.remove-sub-item-btn').addEventListener('click', () => subItem.remove());
+            container.appendChild(template);
+        }
 
-        const deleteHandler = async () => {
-            const result = await apiRequest(`/${id}`, 'DELETE');
+        // --- Event Listeners ---
+        addMainBtn.addEventListener('click', showNewForm);
+
+        function attachFormListeners(form) {
+            form.querySelector('.save-btn').addEventListener('click', () => saveForm(form));
+            form.querySelector('.cancel-btn').addEventListener('click', showPlaceholder);
+
+            if (APP_MODE === 'school') {
+                form.querySelector('.add-grade-btn').addEventListener('click', (e) => {
+                    addSubItem(e.target.closest('div').nextElementSibling, 'grade');
+                });
+                form.querySelector('.add-stream-btn').addEventListener('click', (e) => {
+                    addSubItem(e.target.closest('div').nextElementSibling, 'stream');
+                });
+            } else {
+                form.querySelector('.add-dept-btn').addEventListener('click', (e) => {
+                    addSubItem(e.target.closest('div').nextElementSibling, 'department');
+                });
+            }
+        }
+
+        // --- Actions ---
+        async function saveForm(form) {
+            const id = form.querySelector('[name="id"]').value;
+            const name = form.querySelector('[name="name"]').value;
+            if (!name) {
+                showToast('Main name cannot be empty.', 'error');
+                return;
+            }
+
+            let payload = { id: id || null, name };
+
+            if (APP_MODE === 'school') {
+                payload.grades = Array.from(form.querySelectorAll('.grades-container .sub-item')).map(el => ({ id: el.dataset.id.startsWith('new-') ? null : el.dataset.id, name: el.querySelector('input').value }));
+                payload.streams = Array.from(form.querySelectorAll('.streams-container .sub-item')).map(el => ({ id: el.dataset.id.startsWith('new-') ? null : el.dataset.id, name: el.querySelector('input').value }));
+            } else {
+                payload.departments = Array.from(form.querySelectorAll('.departments-container .sub-item')).map(el => ({ id: el.dataset.id.startsWith('new-') ? null : el.dataset.id, name: el.querySelector('input').value }));
+            }
+
+            const result = await apiRequest(id ? `/${id}` : '', id ? 'PUT' : 'POST', payload);
             if (result) {
                 showToast(result.message, 'success');
-                if (activeId === id) showPlaceholder();
+                showPlaceholder();
                 loadInitialData();
             }
-            closeConfirm();
-        };
+        }
 
-        const closeConfirm = () => {
-            confirmModal.classList.add('hidden');
-            confirmDeleteBtn.removeEventListener('click', deleteHandler);
-            confirmCancelBtn.removeEventListener('click', closeConfirm);
-        };
+        function confirmDeletion(id, name) {
+            confirmText.textContent = `This will permanently delete "${name}" and all its associated data. This action cannot be undone.`;
+            confirmModal.classList.remove('hidden');
 
-        confirmDeleteBtn.addEventListener('click', deleteHandler, { once: true });
-        confirmCancelBtn.addEventListener('click', closeConfirm, { once: true });
-    }
+            const deleteHandler = async () => {
+                const result = await apiRequest(`/${id}`, 'DELETE');
+                if (result) {
+                    showToast(result.message, 'success');
+                    if (activeId === id) showPlaceholder();
+                    loadInitialData();
+                }
+                closeConfirm();
+            };
 
-    function showToast(message, type = 'success') {
-        toast.textContent = message;
-        toast.className = `fixed top-5 right-5 text-white py-2 px-5 rounded-lg shadow-lg text-sm transition-transform z-50`;
-        toast.classList.add(type === 'success' ? 'bg-green-600' : 'bg-red-600');
-        toast.classList.remove('translate-x-[120%]');
-        setTimeout(() => {
-            toast.classList.add('translate-x-[120%]');
-        }, 3000);
-    }
+            const closeConfirm = () => {
+                confirmModal.classList.add('hidden');
+                confirmDeleteBtn.removeEventListener('click', deleteHandler);
+                confirmCancelBtn.removeEventListener('click', closeConfirm);
+            };
 
-    // --- Initial Load ---
-    loadInitialData();
-});
+            confirmDeleteBtn.addEventListener('click', deleteHandler, { once: true });
+            confirmCancelBtn.addEventListener('click', closeConfirm, { once: true });
+        }
+
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = `fixed top-5 right-5 text-white py-2 px-5 rounded-lg shadow-lg text-sm transition-transform z-50`;
+            toast.classList.add(type === 'success' ? 'bg-green-600' : 'bg-red-600');
+            toast.classList.remove('translate-x-[120%]');
+            setTimeout(() => {
+                toast.classList.add('translate-x-[120%]');
+            }, 3000);
+        }
+
+        // --- Initial Load ---
+        loadInitialData();
+    });
 </script>
 {% endblock %}
-

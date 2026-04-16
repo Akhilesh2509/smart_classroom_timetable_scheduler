@@ -23,26 +23,70 @@ Admin Dashboard
 {% block content %}
 
 <style>
-/* QUICK ACTION FIX */
-.quick-btn {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 16px;
-    text-align: center;
-    transition: all 0.25s ease;
-}
+    /* QUICK ACTION FIX */
+    .quick-btn {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 16px;
+        text-align: center;
+        transition: all 0.25s ease;
+    }
 
-.quick-btn span {
-    color: #111827;
-    font-weight: 600;
-}
+    .quick-btn span {
+        color: #111827;
+        font-weight: 600;
+    }
 
-.quick-btn:hover {
-    background: #f9fafb;
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
-}
+    .quick-btn:hover {
+        background: #f9fafb;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .dark .quick-btn {
+        background: #0f172a !important;
+        border-color: #334155 !important;
+        box-shadow: none;
+    }
+
+    .dark .quick-btn span {
+        color: #f8fafc !important;
+    }
+
+    .dark .quick-btn:hover {
+        background: #1e293b !important;
+        border-color: #4b5f7a !important;
+        box-shadow: 0 12px 24px rgba(2, 6, 23, 0.35);
+    }
+
+    .dark .system-metric-card {
+        background: #0f172a !important;
+        border: 1px solid #334155;
+        box-shadow: none;
+    }
+
+    .dark .system-metric-card p:first-child {
+        color: #94a3b8 !important;
+    }
+
+    .dark .system-metric-card p:last-child {
+        color: #f8fafc !important;
+    }
+
+    .dark .system-conflict-card {
+        background: rgba(127, 29, 29, 0.28) !important;
+        border: 1px solid rgba(248, 113, 113, 0.32);
+        box-shadow: none;
+    }
+
+    .dark .system-conflict-card p:first-child {
+        color: #fca5a5 !important;
+    }
+
+    .dark .system-conflict-card p:last-child {
+        color: #fecaca !important;
+    }
 </style>
 
 <div class="space-y-8">
@@ -75,8 +119,8 @@ Admin Dashboard
             </button>
         </div>
 
-        <!-- 🔥 FIXED HERE -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4">
+        <!-- FIXED HERE -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mt-4 quick-actions">
             {% for label, url in [
             ('Manage Students', '/subjects'),
             ('Generate Timetable', '/timetable'),
@@ -118,8 +162,96 @@ Admin Dashboard
 
     <!-- System -->
     <div class="glass-card p-6 rounded-2xl">
-        <h3 class="text-xl font-semibold text-gray-800">System Performance Overview</h3>
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">System Performance Overview</h3>
+
+        <div class="grid grid-cols-2 gap-4">
+
+            <div class="system-metric-card bg-white p-4 rounded-xl shadow">
+                <p class="text-sm text-gray-500">Total Classes</p>
+                <p class="text-xl font-bold" id="total_classes">0</p>
+            </div>
+
+            <div class="system-metric-card bg-white p-4 rounded-xl shadow">
+                <p class="text-sm text-gray-500">Total Teachers</p>
+                <p class="text-xl font-bold" id="total_teachers">0</p>
+            </div>
+
+            <div class="system-metric-card bg-white p-4 rounded-xl shadow">
+                <p class="text-sm text-gray-500">Total Classrooms</p>
+                <p class="text-xl font-bold" id="total_classrooms">0</p>
+            </div>
+
+            <div class="system-metric-card bg-white p-4 rounded-xl shadow">
+                <p class="text-sm text-gray-500">Avg Teacher Load</p>
+                <p class="text-xl font-bold" id="avg_load">0</p>
+            </div>
+
+            <div class="system-metric-card bg-white p-4 rounded-xl shadow col-span-2">
+                <p class="text-sm text-gray-500">Response Time</p>
+                <p class="text-xl font-bold" id="response_time">0 sec</p>
+            </div>
+
+            <div class="system-conflict-card bg-red-100 p-4 rounded-xl shadow col-span-2">
+                <p class="text-sm text-red-500">Conflicts Detected</p>
+                <p class="text-xl font-bold text-red-700" id="conflicts">0</p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="glass-card p-6 rounded-2xl mt-6">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">System Analytics</h3>
+        <canvas id="performanceChart"></canvas>
     </div>
 
 </div>
+
+<script>
+    let chart;
+
+    async function loadPerformance() {
+        try {
+            const res = await fetch('/analytics/system-performance');
+            const data = await res.json();
+
+            document.getElementById('total_classes').innerText = data.total_classes;
+            document.getElementById('total_teachers').innerText = data.total_teachers;
+            document.getElementById('total_classrooms').innerText = data.total_classrooms;
+            document.getElementById('avg_load').innerText = data.avg_teacher_load;
+            document.getElementById('response_time').innerText = data.response_time;
+            document.getElementById('conflicts').innerText = data.conflicts;
+
+            const chartData = [
+                data.total_classes,
+                data.total_teachers,
+                data.total_classrooms,
+                data.conflicts
+            ];
+
+            if (chart) {
+                chart.data.datasets[0].data = chartData;
+                chart.update();
+            } else {
+                const ctx = document.getElementById('performanceChart').getContext('2d');
+
+                chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Classes', 'Teachers', 'Rooms', 'Conflicts'],
+                        datasets: [{
+                            label: 'System Metrics',
+                            data: chartData
+                        }]
+                    }
+                });
+            }
+
+        } catch (err) {
+            console.error("Error loading performance:", err);
+        }
+    }
+
+    loadPerformance();
+    setInterval(loadPerformance, 5000);
+</script>
 {% endblock %}

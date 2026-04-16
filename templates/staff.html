@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="glass-card rounded-2xl p-6 h-[calc(100vh-10rem)] flex flex-col">
+<div id="staff-page" class="glass-card rounded-2xl p-6 h-[calc(100vh-10rem)] flex flex-col">
     <!-- Header -->
     <div class="flex-shrink-0 flex flex-col md:flex-row justify-between items-center pb-4 mb-4 border-b border-gray-700 gap-4">
         <div class="w-full md:w-auto flex-grow">
@@ -34,7 +34,7 @@ transition-all duration-200">
 
     <!-- Table View -->
     <div id="table-container" class="flex-grow overflow-auto">
-        <table id="teachers-table" class="w-full text-sm text-left text-gray-300">
+        <table id="teachers-table" class="w-full text-sm text-left">
             <thead class="text-xs text-gray-400 uppercase bg-gray-800/50 sticky top-0">
                 <tr>
                     <th scope="col" class="px-6 py-3">Full Name</th>
@@ -116,107 +116,196 @@ transition-all duration-200">
 </div>
 
 <style>
+    #staff-page {
+        background: #ffffff !important;
+        border-color: #c8d2ea !important;
+    }
 
-/* ===== CARD ===== */
-.glass-card {
-    background: #ffffff !important;
-    border: 1px solid #e5e7eb !important;
-}
+    #staff-page .border-gray-700 {
+        border-color: #d8def0 !important;
+    }
 
-/* ===== TEXT ===== */
-.text-white {
-    color: #111827 !important;
-}
+    #staff-page .input-base,
+    #form-modal .input-base {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #111827 !important;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        width: 100%;
+    }
 
-.text-gray-300 {
-    color: #374151 !important;
-}
+    #staff-page .input-base:focus,
+    #form-modal .input-base:focus {
+        outline: none;
+        border-color: #7091E6 !important;
+        box-shadow: 0 0 0 2px #EDE8F5;
+    }
 
-.text-gray-400 {
-    color: #6b7280 !important;
-}
+    #staff-page #teachers-table {
+        border-collapse: separate;
+        border-spacing: 0;
+    }
 
-/* ===== INPUT ===== */
-.input-base {
-    background: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
-    color: #111827 !important;
-}
+    #staff-page #teachers-table thead {
+        background: #e6ecff !important;
+    }
 
-.input-base:focus {
-    border-color: #7091E6 !important;
-    box-shadow: 0 0 0 2px #EDE8F5 !important;
-}
+    #staff-page #teachers-table th {
+        color: #3D52A0 !important;
+        font-weight: 700;
+        letter-spacing: 0;
+        border-bottom: 1px solid #d8def0;
+    }
 
-/* ===== TABLE ===== */
-thead {
-    background: #EDE8F5 !important;
-    color: #111827 !important;
-}
+    #staff-page #teachers-table tbody tr {
+        background: #ffffff !important;
+    }
 
-tbody tr {
-    border-color: #e5e7eb !important;
-}
+    #staff-page #teachers-table tbody tr:nth-child(even) {
+        background: #f8faff !important;
+    }
 
-/* row hover */
-.hover\:bg-gray-800\/50:hover {
-    background: #f5f7ff !important;
-}
+    #staff-page #teachers-table tbody tr:hover {
+        background: #edf2ff !important;
+    }
 
-/* ===== SUBJECT TAG ===== */
-.subject-tag {
-    background: #7091E6;
-    color: #ffffff;
-}
+    #staff-page #teachers-table td {
+        color: #1f2937 !important;
+        border-bottom: 1px solid #e1e7f5 !important;
+    }
 
-/* ===== BUTTONS ===== */
-.btn-primary {
-    background: #7091E6;
-    color: white;
-}
-.btn-primary:hover {
-    background: #3D52A0;
-}
+    #staff-page .teacher-name {
+        color: #111827 !important;
+        font-weight: 700;
+    }
 
-.btn-secondary {
-    background: #e5e7eb;
-    color: #111827;
-}
-.btn-secondary:hover {
-    background: #d1d5db;
-}
+    #staff-page .teacher-email,
+    #staff-page .teacher-empty,
+    #staff-page .teacher-subject-empty {
+        color: #64748b !important;
+    }
 
-.btn-danger {
-    background: #ef4444;
-}
-.btn-danger:hover {
-    background: #dc2626;
-}
+    #staff-page .subject-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.2rem 0.5rem;
+        border-radius: 999px;
+        background: #eef3ff;
+        color: #3D52A0;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
 
-/* ===== DROPDOWN ===== */
-.bg-gray-800 {
-    background: #ffffff !important;
-}
+    #staff-page .edit-btn {
+        color: #4f46e5 !important;
+    }
 
-.border-gray-700 {
-    border-color: #e5e7eb !important;
-}
+    #staff-page .delete-btn {
+        color: #dc2626 !important;
+    }
 
-/* ===== SELECTED SUBJECT BOX ===== */
-.bg-gray-900\/50 {
-    background: #f9fafb !important;
-}
+    .dark #staff-page {
+        background: #1e293b !important;
+        border-color: #334155 !important;
+    }
 
-/* ===== MODAL ===== */
-#form-modal .glass-card {
-    background: #ffffff !important;
-}
+    .dark #staff-page .border-gray-700 {
+        border-color: #334155 !important;
+    }
 
-.bg-black\/60 {
-    background: rgba(0,0,0,0.4) !important;
-}
+    .dark #staff-page .input-base,
+    .dark #form-modal .input-base {
+        background: #0f172a !important;
+        border-color: #334155 !important;
+        color: #e5e7eb !important;
+    }
 
+    .dark #staff-page .input-base::placeholder,
+    .dark #form-modal .input-base::placeholder {
+        color: #94a3b8;
+    }
+
+    .dark #staff-page #teachers-table thead {
+        background: #0f172a !important;
+    }
+
+    .dark #staff-page #teachers-table th {
+        color: #cbd5e1 !important;
+        border-bottom-color: #334155;
+    }
+
+    .dark #staff-page #teachers-table tbody tr {
+        background: #111827 !important;
+    }
+
+    .dark #staff-page #teachers-table tbody tr:nth-child(even) {
+        background: #162033 !important;
+    }
+
+    .dark #staff-page #teachers-table tbody tr:hover {
+        background: #22304a !important;
+    }
+
+    .dark #staff-page #teachers-table td {
+        color: #e5e7eb !important;
+        border-bottom-color: #334155 !important;
+    }
+
+    .dark #staff-page .teacher-name {
+        color: #f8fafc !important;
+    }
+
+    .dark #staff-page .teacher-email,
+    .dark #staff-page .teacher-empty,
+    .dark #staff-page .teacher-subject-empty {
+        color: #94a3b8 !important;
+    }
+
+    .dark #staff-page .subject-tag {
+        background: rgba(124, 58, 237, 0.22);
+        color: #ddd6fe;
+    }
+
+    .dark #staff-page .edit-btn {
+        color: #60a5fa !important;
+    }
+
+    .dark #staff-page .delete-btn {
+        color: #f87171 !important;
+    }
+
+    .dark #form-modal .glass-card,
+    .dark #confirm-modal .glass-card {
+        background: #1e293b !important;
+        border: 1px solid #334155 !important;
+    }
+
+    .dark #form-modal .text-white,
+    .dark #confirm-modal .text-white {
+        color: #f8fafc !important;
+    }
+
+    .dark #form-modal .text-gray-300 {
+        color: #cbd5e1 !important;
+    }
+
+    .dark #confirm-modal .text-gray-400 {
+        color: #94a3b8 !important;
+    }
+
+    .dark #selected-subjects,
+    .dark #subjects-dropdown {
+        background: #0f172a !important;
+        border-color: #334155 !important;
+        color: #e5e7eb !important;
+    }
+
+    .dark #subjects-dropdown .subject-option:hover {
+        background: #22304a !important;
+    }
 </style>
+
 {% endblock %}
 
 {% block scripts %}
@@ -350,11 +439,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         filteredTeachers.forEach(teacher => {
             const row = tableBody.insertRow();
-            row.className = 'border-b border-gray-800 hover:bg-gray-800/50';
+            row.className = 'teacher-row';
 
             row.innerHTML = `
-                <td class="px-6 py-4 font-medium text-white">${teacher.full_name}<br><span class="text-xs text-gray-400">${teacher.email}</span></td>
-                <td class="px-6 py-4"><div class="flex flex-wrap gap-1">${teacher.subjects.map(s => `<span class="subject-tag">${s.name}</span>`).join('') || '<span class="text-xs text-gray-500">None</span>'}</div></td>
+                <td class="px-6 py-4"><span class="teacher-name">${teacher.full_name}</span><br><span class="teacher-email text-xs">${teacher.email}</span></td>
+                <td class="px-6 py-4"><div class="flex flex-wrap gap-1">${teacher.subjects.map(s => `<span class="subject-tag">${s.name}</span>`).join('') || '<span class="teacher-subject-empty text-xs">None</span>'}</div></td>
                 <td class="px-6 py-4">${teacher.max_weekly_hours}</td>
                 <td class="px-6 py-4 text-right">
                     <button class="font-medium text-purple-400 hover:underline mr-4 edit-btn">Edit</button>

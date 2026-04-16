@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="glass-card rounded-2xl p-6 h-[calc(100vh-10rem)] flex flex-col">
+<div id="subjects-page" class="glass-card rounded-2xl p-6 min-h-[28rem] flex flex-col">
     <!-- Header with Filters and Add Button -->
     <div class="flex-shrink-0 flex flex-col md:flex-row justify-between items-center pb-4 mb-4 border-b border-gray-700 gap-4">
         <div class="w-full md:w-auto flex-grow grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -30,7 +30,7 @@
     </div>
 
     <!-- Table View -->
-    <div id="table-container" class="flex-grow overflow-auto">
+    <div id="table-container" class="flex-1 min-h-[18rem] overflow-auto">
         <div id="placeholder-view" class="h-full flex flex-col items-center justify-center text-center text-gray-500">
              <svg class="h-12 w-12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"></path>
@@ -114,11 +114,67 @@
 </div>
 
 <style>
-/* ===== INPUT FIX (WHITE) ===== */
-.input-base {
-    background: #ffffff; /* white */
-    border: 1px solid #cbd5e1; /* soft border */
-    color: #111827; /* black text */
+#subjects-page {
+    background: #ffffff !important;
+    border-color: #c8d2ea !important;
+}
+
+#subjects-page .border-gray-700 {
+    border-color: #d8def0 !important;
+}
+
+#subjects-page #placeholder-view {
+    color: #64748b !important;
+}
+
+#subjects-page #items-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    color: #111827 !important;
+}
+
+#subjects-page #items-table thead {
+    background: #e6ecff !important;
+}
+
+#subjects-page #items-table thead th {
+    color: #3D52A0 !important;
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+#subjects-page #items-table tbody tr {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e1e7f5 !important;
+}
+
+#subjects-page #items-table tbody tr:nth-child(even) {
+    background: #f8faff !important;
+}
+
+#subjects-page #items-table tbody tr:hover {
+    background: #edf2ff !important;
+}
+
+#subjects-page #items-table td {
+    color: #1f2937 !important;
+    border-bottom: 1px solid #e1e7f5 !important;
+}
+
+#subjects-page #items-table .edit-btn {
+    color: #4f46e5 !important;
+}
+
+#subjects-page #items-table .delete-btn {
+    color: #dc2626 !important;
+}
+
+/* ===== INPUT FIX ===== */
+#subjects-page .input-base,
+#form-modal .input-base {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #111827;
     padding: 0.5rem 0.75rem;
     border-radius: 0.5rem;
     width: 100%;
@@ -126,26 +182,30 @@
 }
 
 /* focus effect */
-.input-base:focus {
+#subjects-page .input-base:focus,
+#form-modal .input-base:focus {
     outline: none;
     border-color: #7091E6;
     box-shadow: 0 0 0 2px #EDE8F5;
 }
 
 /* disabled */
-.input-base:disabled {
+#subjects-page .input-base:disabled,
+#form-modal .input-base:disabled {
     background-color: #f1f5f9;
     cursor: not-allowed;
 }
 
 /* dropdown fix */
-select option {
+#subjects-page select option,
+#form-modal select option {
     background: #ffffff;
     color: #111827;
 }
 
 /* ===== PRIMARY BUTTON ===== */
-.btn-primary {
+#subjects-page .btn-primary,
+#form-modal .btn-primary {
     background-color: #7091E6; /* blue */
     color: white;
     padding: 0.5rem 1rem;
@@ -157,18 +217,21 @@ select option {
     justify-content: center;
 }
 
-.btn-primary:hover {
+#subjects-page .btn-primary:hover,
+#form-modal .btn-primary:hover {
     background-color: #3D52A0;
 }
 
-.btn-primary:disabled {
+#subjects-page .btn-primary:disabled,
+#form-modal .btn-primary:disabled {
     background-color: #c7d2fe;
     color: #64748b;
     cursor: not-allowed;
 }
 
 /* ===== SECONDARY BUTTON ===== */
-.btn-secondary {
+#form-modal .btn-secondary,
+#confirm-modal .btn-secondary {
     background-color: #e5e7eb;
     color: #111827;
     padding: 0.5rem 1rem;
@@ -177,12 +240,13 @@ select option {
     transition: all 0.2s ease;
 }
 
-.btn-secondary:hover {
+#form-modal .btn-secondary:hover,
+#confirm-modal .btn-secondary:hover {
     background-color: #d1d5db;
 }
 
 /* ===== DANGER BUTTON ===== */
-.btn-danger {
+#confirm-modal .btn-danger {
     background-color: #ef4444;
     color: white;
     padding: 0.5rem 1rem;
@@ -191,8 +255,109 @@ select option {
     transition: all 0.2s ease;
 }
 
-.btn-danger:hover {
+#confirm-modal .btn-danger:hover {
     background-color: #dc2626;
+}
+
+.dark #subjects-page {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+.dark #subjects-page .border-gray-700 {
+    border-color: #334155 !important;
+}
+
+.dark #subjects-page #placeholder-view {
+    color: #94a3b8 !important;
+}
+
+.dark #subjects-page #items-table {
+    color: #e5e7eb !important;
+}
+
+.dark #subjects-page #items-table thead {
+    background: #0f172a !important;
+}
+
+.dark #subjects-page #items-table thead th {
+    color: #cbd5e1 !important;
+}
+
+.dark #subjects-page #items-table tbody tr,
+.dark #subjects-page #items-table tbody tr:nth-child(even) {
+    background: #111827 !important;
+}
+
+.dark #subjects-page #items-table tbody tr:nth-child(even) {
+    background: #162033 !important;
+}
+
+.dark #subjects-page #items-table tbody tr:hover {
+    background: #22304a !important;
+}
+
+.dark #subjects-page #items-table td {
+    color: #e5e7eb !important;
+    border-bottom-color: #334155 !important;
+}
+
+.dark #subjects-page #items-table .edit-btn {
+    color: #a78bfa !important;
+}
+
+.dark #subjects-page #items-table .delete-btn {
+    color: #f87171 !important;
+}
+
+.dark #subjects-page .input-base,
+.dark #form-modal .input-base {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #e5e7eb !important;
+}
+
+.dark #subjects-page .input-base:disabled,
+.dark #form-modal .input-base:disabled {
+    background-color: #111827 !important;
+    color: #64748b !important;
+}
+
+.dark #subjects-page select option,
+.dark #form-modal select option {
+    background: #0f172a;
+    color: #e5e7eb;
+}
+
+.dark #form-modal .glass-card,
+.dark #confirm-modal .glass-card {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+}
+
+.dark #form-modal .text-white,
+.dark #confirm-modal .text-white {
+    color: #f8fafc !important;
+}
+
+.dark #form-modal .text-gray-300 {
+    color: #cbd5e1 !important;
+}
+
+.dark #confirm-modal .text-gray-400 {
+    color: #94a3b8 !important;
+}
+
+.dark #form-modal .btn-secondary,
+.dark #confirm-modal .btn-secondary {
+    background-color: #111827 !important;
+    border: 1px solid #334155;
+    color: #e5e7eb !important;
+}
+
+.dark #form-modal .btn-secondary:hover,
+.dark #confirm-modal .btn-secondary:hover {
+    background-color: #22304a !important;
 }
 </style>
 {% endblock %}
@@ -271,7 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tableBody.innerHTML = '';
         items.forEach(item => {
             const row = tableBody.insertRow();
-            row.className = 'bg-[#EDE8F5]';
+            row.className = 'subject-row';
             const cells = APP_MODE === 'school' ? [
                 item.name, item.code, item.weekly_hours, item.is_elective ? 'Yes' : 'No'
             ] : [

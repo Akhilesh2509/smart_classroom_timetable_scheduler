@@ -107,11 +107,184 @@ tr:hover {
     color: #374151 !important;
 }
 
+/* ===== DARK MODE REPAIR ===== */
+.dark #exam-page .glass-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+.dark #exam-page .text-gray-100,
+.dark #exam-page .text-gray-200 {
+    color: #f8fafc !important;
+}
+
+.dark #exam-page .text-gray-300 {
+    color: #cbd5e1 !important;
+}
+
+.dark #exam-page .text-gray-400,
+.dark #exam-page .text-gray-500 {
+    color: #94a3b8 !important;
+}
+
+.dark #exam-page select,
+.dark #exam-page input {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #e5e7eb !important;
+}
+
+.dark #exam-page select option,
+.dark #exam-modal select option {
+    background: #0f172a;
+    color: #e5e7eb;
+}
+
+.dark #exam-page [class*="border-gray"] {
+    border-color: #334155 !important;
+}
+
+.dark #exam-page [class*="bg-gray-700"] {
+    background: #111827 !important;
+}
+
+.dark #exam-page [class*="bg-gray-800"] {
+    background: #1e293b !important;
+}
+
+.dark #exam-page [class*="bg-gray-900"] {
+    background: #0f172a !important;
+}
+
+.dark #exam-page thead {
+    background: #0f172a !important;
+}
+
+.dark #exam-page #exams-container th {
+    color: #cbd5e1 !important;
+}
+
+.dark #exam-page #exams-container td {
+    color: #e5e7eb !important;
+    border-color: #334155 !important;
+}
+
+.dark #exam-page #exams-container .exam-row {
+    background: #111827 !important;
+    border-bottom: 1px solid #334155 !important;
+}
+
+.dark #exam-page #exams-container .exam-row:nth-child(even) {
+    background: #162033 !important;
+}
+
+.dark #exam-page #exams-container .exam-row:hover {
+    background: #22304a !important;
+}
+
+.dark #exam-page #exams-container td div {
+    color: #cbd5e1 !important;
+}
+
+.dark #exam-page #exams-container td div.font-medium {
+    color: #f8fafc !important;
+}
+
+.dark #exam-page #exams-container td div.text-sm {
+    color: #94a3b8 !important;
+}
+
+.dark #exam-page #exams-container td span.text-gray-700 {
+    color: #cbd5e1 !important;
+}
+
+.dark #exam-page .bg-blue-900 {
+    background: #1e3a8a !important;
+}
+
+.dark #exam-page .bg-green-900 {
+    background: #14532d !important;
+}
+
+.dark #exam-page .bg-yellow-900 {
+    background: #713f12 !important;
+}
+
+.dark #exam-page .bg-purple-900 {
+    background: #581c87 !important;
+}
+
+.dark #exam-page .bg-red-100 {
+    background: #7f1d1d !important;
+    color: #fecaca !important;
+}
+
+.dark #exam-page .bg-yellow-100 {
+    background: #713f12 !important;
+    color: #fef3c7 !important;
+}
+
+.dark #exam-page .bg-blue-100 {
+    background: #1e3a8a !important;
+    color: #bfdbfe !important;
+}
+
+.dark #exam-page .bg-green-100 {
+    background: #14532d !important;
+    color: #bbf7d0 !important;
+}
+
+.dark #exam-page button.text-blue-600 {
+    color: #60a5fa !important;
+}
+
+.dark #exam-page button.text-green-600 {
+    color: #4ade80 !important;
+}
+
+.dark #exam-page button.text-red-600 {
+    color: #f87171 !important;
+}
+
+.dark #exam-modal .bg-gray-800,
+.dark #schedule-modal .bg-gray-800,
+.dark #toast > div {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+.dark #exam-modal .bg-gray-700,
+.dark #schedule-modal .bg-gray-700 {
+    background: #111827 !important;
+}
+
+.dark #exam-modal input,
+.dark #exam-modal select {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #e5e7eb !important;
+}
+
+.dark #exam-modal .text-gray-100,
+.dark #schedule-modal .text-gray-100,
+.dark #toast .text-gray-100 {
+    color: #f8fafc !important;
+}
+
+.dark #exam-modal .text-gray-300 {
+    color: #cbd5e1 !important;
+}
+
+.dark #exam-modal .text-gray-400,
+.dark #schedule-modal .text-gray-400 {
+    color: #94a3b8 !important;
+}
+
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div id="exam-page" class="space-y-6">
     <!-- Controls Panel -->
     <div class="glass-card p-6">
         <div class="flex flex-wrap items-center justify-between gap-4">
@@ -627,7 +800,7 @@ document.addEventListener('DOMContentLoaded', () => {
         examsTableBody.innerHTML = '';
         filteredExams.forEach(exam => {
             const row = document.createElement('tr');
-            row.className = 'border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700';
+            row.className = 'exam-row border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700';
             
             const examDate = new Date(exam.date);
             const isUpcoming = examDate > new Date();

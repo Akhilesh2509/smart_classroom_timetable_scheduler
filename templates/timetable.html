@@ -80,12 +80,105 @@ tr:hover {
     background: #f5f7ff !important;
 }
 
+.dark #timetable-page .glass-card {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+
+.dark #timetable-page .text-gray-100,
+.dark #timetable-page .text-gray-200 {
+    color: #f8fafc !important;
+}
+
+.dark #timetable-page .text-gray-300 {
+    color: #cbd5e1 !important;
+}
+
+.dark #timetable-page .text-gray-400 {
+    color: #94a3b8 !important;
+}
+
+.dark #timetable-page .text-gray-500,
+.dark #timetable-page .text-gray-600 {
+    color: #64748b !important;
+}
+
+.dark #timetable-page select {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+    color: #e5e7eb !important;
+}
+
+.dark #timetable-page select:disabled {
+    background: #111827 !important;
+    color: #64748b !important;
+}
+
+.dark #timetable-page select option {
+    background: #0f172a;
+    color: #e5e7eb;
+}
+
+.dark #timetable-page [class*="border-gray"] {
+    border-color: #334155 !important;
+}
+
+.dark #timetable-page thead,
+.dark #timetable-page [class*="bg-gray-700"] {
+    background: #0f172a !important;
+}
+
+.dark #timetable-page [class*="bg-gray-800"] {
+    background: #111827 !important;
+}
+
+.dark #timetable-page [class*="bg-gray-900"] {
+    background: #0b1120 !important;
+}
+
+.dark #timetable-page tr:hover {
+    background: transparent !important;
+}
+
+.dark #timetable-page table th {
+    color: #cbd5e1 !important;
+}
+
+.dark #timetable-page table td {
+    color: #e5e7eb !important;
+}
+
+.dark #timetable-page .bg-blue-900 {
+    background: #1e3a8a !important;
+}
+
+.dark #timetable-page .border-blue-600 {
+    border-color: #3b82f6 !important;
+}
+
+.dark #timetable-page .text-blue-300 {
+    color: #bfdbfe !important;
+}
+
+.dark #timetable-page .bg-orange-800 {
+    background: #7c2d12 !important;
+}
+
+.dark #timetable-page .bg-orange-900 {
+    background: #431407 !important;
+}
+
+.dark #timetable-page .text-orange-200,
+.dark #timetable-page .text-orange-300 {
+    color: #fed7aa !important;
+}
+
 </style>
 {% endblock %}
 
 
 {% block content %}
-<div class="space-y-6">
+<div id="timetable-page" class="space-y-6">
 
     <!-- Controls Panel -->
      {% if session.get('role') == 'admin' %}

@@ -430,98 +430,313 @@
 
 <style>
 
-/* ===== GLASS CARD FIX ===== */
-.glass-card {
-    background: #ffffff !important;
-    border: 1px solid #e5e7eb !important;
-}
-
-/* ===== TEXT FIX ===== */
-.text-white {
+/* Batches page light mode: soft surfaces without turning the whole page dark. */
+header .text-white {
     color: #111827 !important;
 }
 
-.text-gray-300 {
-    color: #374151 !important;
-}
-
-.text-gray-400 {
+header .text-gray-400 {
     color: #6b7280 !important;
 }
 
-/* ===== TABLE FIX ===== */
-thead {
-    background: #EDE8F5 !important;
+#app .glass-card {
+    background: #ffffff !important;
+    border: 1px solid #d8def0 !important;
+    box-shadow: 0 16px 34px rgba(61, 82, 160, 0.08);
 }
 
-tbody {
+#app .glass-card:hover {
+    box-shadow: 0 18px 38px rgba(61, 82, 160, 0.12);
+}
+
+#app .text-white {
+    color: #111827 !important;
+}
+
+#app .text-gray-300 {
+    color: #374151 !important;
+}
+
+#app .text-gray-400 {
+    color: #6b7280 !important;
+}
+
+#app table {
+    background: #f8faff !important;
+}
+
+#app thead {
+    background: #e6ecff !important;
+}
+
+#app thead th {
+    color: #3D52A0 !important;
+}
+
+#app tbody {
+    background: #f8faff !important;
+}
+
+#app tbody tr {
     background: #ffffff !important;
 }
 
-.divide-gray-700 > * {
-    border-color: #e5e7eb !important;
+#app tbody tr:nth-child(even) {
+    background: #f6f8ff !important;
 }
 
-/* ===== HOVER FIX ===== */
-.hover\:bg-gray-800\/30:hover {
-    background: #f5f7ff !important;
+#app tbody tr:hover,
+#app .hover\:bg-gray-800\/30:hover {
+    background: #edf2ff !important;
 }
 
-/* ===== BOX FIX ===== */
-.bg-gray-800\/30 {
-    background: #f9fafb !important;
+#app td {
+    color: #374151 !important;
 }
 
-.bg-gray-900\/50 {
-    background: #f3f4f6 !important;
+#app .divide-gray-700 > * {
+    border-color: #e1e7f5 !important;
 }
 
-/* ===== MODAL FIX ===== */
-.modal-content { 
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
+#app .border-gray-700 {
+    border-color: #d8def0 !important;
 }
 
-.modal-header h3 { 
+#app .bg-gray-800\/30,
+#app .bg-gray-800\/50 {
+    background: #eef3ff !important;
+}
+
+#app .bg-gray-900\/50 {
+    background: #f4f7ff !important;
+}
+
+#app .input-base {
+    background: #ffffff !important;
+    border: 1px solid #b8c4e2 !important;
+    color: #111827 !important;
+    border-radius: 8px;
+}
+
+#app .input-base:disabled {
+    background: #f1f5fb !important;
+    color: #94a3b8 !important;
+    cursor: not-allowed;
+}
+
+#app .input-base:focus {
+    border-color: #7091E6 !important;
+    box-shadow: 0 0 0 3px rgba(112, 145, 230, 0.18) !important;
+    outline: none;
+}
+
+#app .btn-primary {
+    background: #3b82f6 !important;
+    color: #ffffff !important;
+    border-radius: 8px;
+}
+
+#app .btn-primary:hover {
+    background: #2563eb !important;
+}
+
+#app .btn-secondary {
+    background: #f8faff !important;
+    border: 1px solid #c8d2ea !important;
+    color: #1f2937 !important;
+    border-radius: 8px;
+}
+
+#app .btn-secondary:hover {
+    background: #edf2ff !important;
+}
+
+#app .modal-backdrop {
+    background: rgba(15, 23, 42, 0.42);
+}
+
+#app .modal-content {
+    background: #ffffff !important;
+    border: 1px solid #d8def0 !important;
     color: #111827;
 }
 
-.modal-header {
-    border-bottom: 1px solid #e5e7eb;
+#app .modal-header,
+#app .modal-footer {
+    border-color: #e1e7f5 !important;
 }
 
-.modal-footer {
-    border-top: 1px solid #e5e7eb;
+#app .modal-header h3 {
+    color: #111827 !important;
 }
 
-/* ===== BUTTON FIX ===== */
-.btn-primary {
-    background: #7091E6;
-}
-
-.btn-primary:hover {
-    background: #3D52A0;
-}
-
-/* ===== INPUT FIX ===== */
-.input-base {
-    background: #ffffff;
-    border: 1px solid #cbd5e1;
-    color: #111827;
-}
-
-.input-base:focus {
-    border-color: #7091E6;
-    box-shadow: 0 0 0 2px #EDE8F5;
-}
-
-/* ===== SCROLLBAR ===== */
-.modal-content::-webkit-scrollbar-thumb {
+#app .modal-content::-webkit-scrollbar-thumb {
     background: #cbd5e1;
 }
 
-.modal-content::-webkit-scrollbar-thumb:hover {
+#app .modal-content::-webkit-scrollbar-thumb:hover {
     background: #94a3b8;
+}
+
+/* Batches page dark mode: applied only when the accessibility dark toggle is on. */
+.dark header .text-white {
+    color: #f8fafc !important;
+}
+
+.dark header .text-gray-400 {
+    color: #cbd5f5 !important;
+}
+
+.dark #app .glass-card {
+    background: #182235 !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 18px 40px rgba(2, 6, 23, 0.22);
+}
+
+.dark #app .glass-card:hover {
+    box-shadow: 0 20px 44px rgba(2, 6, 23, 0.28);
+}
+
+.dark #app .text-white {
+    color: #f8fafc !important;
+}
+
+.dark #app .text-gray-300 {
+    color: #cbd5e1 !important;
+}
+
+.dark #app .text-gray-400 {
+    color: #94a3b8 !important;
+}
+
+.dark #app .text-gray-500 {
+    color: #64748b !important;
+}
+
+.dark #app .text-gray-600 {
+    color: #475569 !important;
+}
+
+.dark #app .input-base {
+    background: #0f172a !important;
+    border: 1px solid #3f4d63 !important;
+    color: #e5e7eb !important;
+    border-radius: 8px;
+}
+
+.dark #app .input-base:disabled {
+    background: #111827 !important;
+    color: #64748b !important;
+    cursor: not-allowed;
+}
+
+.dark #app .input-base:focus {
+    border-color: #7091E6 !important;
+    box-shadow: 0 0 0 3px rgba(112, 145, 230, 0.2) !important;
+    outline: none;
+}
+
+.dark #app .input-base option {
+    background: #0f172a;
+    color: #e5e7eb;
+}
+
+.dark #app table {
+    background: #131d2f !important;
+}
+
+.dark #app thead {
+    background: #0f172a !important;
+}
+
+.dark #app thead th {
+    color: #94a3b8 !important;
+}
+
+.dark #app tbody {
+    background: #131d2f !important;
+}
+
+.dark #app tbody tr {
+    background: #172236 !important;
+}
+
+.dark #app tbody tr:nth-child(even) {
+    background: #1b273b !important;
+}
+
+.dark #app tbody tr:hover,
+.dark #app .hover\:bg-gray-800\/30:hover {
+    background: #22304a !important;
+}
+
+.dark #app td {
+    color: #cbd5e1 !important;
+}
+
+.dark #app .divide-gray-700 > * {
+    border-color: #334155 !important;
+}
+
+.dark #app .border-gray-700 {
+    border-color: #334155 !important;
+}
+
+.dark #app .bg-gray-800\/30,
+.dark #app .bg-gray-800\/50 {
+    background: #111827 !important;
+}
+
+.dark #app .bg-gray-900\/50 {
+    background: #0b1120 !important;
+}
+
+.dark #app .btn-primary {
+    background: #3b82f6 !important;
+    color: #ffffff !important;
+    border-radius: 8px;
+}
+
+.dark #app .btn-primary:hover {
+    background: #2563eb !important;
+}
+
+.dark #app .btn-secondary {
+    background: #111827 !important;
+    border: 1px solid #334155 !important;
+    color: #e5e7eb !important;
+    border-radius: 8px;
+}
+
+.dark #app .btn-secondary:hover {
+    background: #22304a !important;
+}
+
+.dark #app .modal-backdrop {
+    background: rgba(2, 6, 23, 0.72);
+}
+
+.dark #app .modal-content {
+    background: #182235 !important;
+    border: 1px solid #334155 !important;
+    color: #e5e7eb;
+}
+
+.dark #app .modal-header,
+.dark #app .modal-footer {
+    border-color: #334155 !important;
+}
+
+.dark #app .modal-header h3 {
+    color: #f8fafc !important;
+}
+
+.dark #app .modal-content::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+
+.dark #app .modal-content::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
 }
 
 </style>
@@ -529,12 +744,14 @@ tbody {
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/vue@3.2.47/dist/vue.global.prod.js"></script>
+<script id="initial-primary-data" type="application/json">{{ (initial_primary_data | default([], true)) | tojson }}</script>
 <script>
 const { createApp, ref, reactive, onMounted, watch } = Vue;
+const initialPrimaryData = JSON.parse(document.getElementById('initial-primary-data').textContent || '[]');
 
 createApp({
     setup() {
-        const primaryFilterData = ref([]);
+        const primaryFilterData = ref(initialPrimaryData);
         const secondaryFilterData = ref([]);
         const sections = ref([]);
         const isSaving = ref(false);
@@ -554,8 +771,15 @@ createApp({
 
         const fetchPrimary = async () => {
             const url = appMode === 'school' ? "{{ url_for('structure.get_structure_items', mode='school') }}" : "{{ url_for('structure.get_structure_items', mode='college') }}";
-            const res = await fetch(url);
-            primaryFilterData.value = (await res.json()).items;
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error(`Failed to load filters: ${res.status}`);
+                const data = await res.json();
+                primaryFilterData.value = data.items || initialPrimaryData;
+            } catch (error) {
+                console.error(error);
+                primaryFilterData.value = initialPrimaryData;
+            }
         };
 
         const fetchSecondary = () => {
