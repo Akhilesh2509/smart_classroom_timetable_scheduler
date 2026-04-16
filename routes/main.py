@@ -1,6 +1,6 @@
 import json
 from datetime import datetime, timezone
-from flask import Blueprint, render_template, request, redirect, url_for, session, g, flash, jsonify, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, session, g, flash, jsonify, current_app, Response, stream_with_context
 from sqlalchemy import exc
 
 from models import AppConfig, User, SchoolGroup, Grade, Stream, Subject, Semester, Department, Course, SystemMetric, ActivityLog, TimetableEntry
@@ -111,31 +111,81 @@ def setup():
 
 @main_bp.route('/generate-fake-data', methods=['POST'])
 def generate_fake_data():
-    try:
-        from flask import current_app
+    def event(kind, message=None, **extra):
+        payload = {"type": kind, **extra}
+        if message is not None:
+            payload["message"] = message
+        return f"data: {json.dumps(payload)}\n\n"
 
-        with current_app.app_context():
+    def log_line(message):
+        return event("log", message)
+
+    @stream_with_context
+    def generate():
+        try:
+            current_app.config['FAKE_DATA_RUNNING'] = True
+            yield log_line("🚀 Starting fake data generation...")
+            yield log_line("📦 Preparing database tables...")
             db.create_all()
-            clear_database()
-            create_realistic_data()
 
-        if 'user_id' not in session:
+            yield log_line("🧹 Clearing existing database...")
+            clear_database()
+            yield log_line("✅ Database cleared")
+
+            yield log_line("🏗️ Creating realistic data...")
+            yield log_line("📚 Creating semesters, departments, subjects, and courses...")
+            yield log_line("🏫 Creating classrooms, teachers, students, and class-wise exams...")
+            data = create_realistic_data()
+
+            yield log_line(
+                f"✅ Created {len(data['students'])} students, {len(data['teachers'])} teachers, "
+                f"{len(data['classrooms'])} classrooms, {len(data['courses'])} courses, and {len(data.get('exams', []))} exams."
+            )
+
+            session.clear()
+            yield log_line("🎉 Fake data generation completed")
+            yield log_line("↪️ Redirecting to login...")
+            yield event("done", redirect=url_for('main.login'))
+
+        except Exception as e:
+            db.session.rollback()
+            print("FAKER ERROR:", e)
+            yield log_line(f"🔥 ERROR: {e}")
+            yield event("error", message=str(e))
+
+        current_app.config['FAKE_DATA_RUNNING'] = False
+
+    return Response(generate(), mimetype='text/event-stream')
+
+
+@main_bp.route('/reset', methods=['GET', 'POST'])
+def reset_system():
+    try:
+        db.create_all()
+        clear_database()
+        session.clear()
+
+        if request.method == 'POST':
             return jsonify({
-                "status": "success",
-                "redirect": url_for('main.login')
+                'status': 'success',
+                'redirect': url_for('main.setup'),
+                'message': 'All data deleted successfully.'
             })
 
-        return jsonify({"status": "success"})
-
+        return redirect(url_for('main.setup'))
     except Exception as e:
         db.session.rollback()
-        print("🔥 FAKER ERROR:", e)
+        print(f"RESET ERROR: {e}")
 
-        # 🔥 FORCE JSON RESPONSE
-        return jsonify({
-            "status": "error",
-            "message": str(e)
-        }), 500
+        if request.method == 'POST':
+            return jsonify({
+                'status': 'error',
+                'message': f'Failed to reset system: {e}'
+            }), 500
+
+        flash(f'Failed to reset system: {e}', 'error')
+        return redirect(url_for('main.setup'))
+
 
 @main_bp.route('/login', methods=['GET', 'POST'])
 def login():

@@ -368,70 +368,257 @@ def clear_timetable():
 
 @timetable_bp.route('/api/export_timetable', methods=['GET'])
 def export_timetable():
-    """Export timetable as CSV."""
+    """Export timetable as a PDF, with one section timetable per page."""
     if 'user_id' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
 
     try:
-        import csv
-        import io
-
-        # Get all timetable entries
         entries = TimetableEntry.query.options(
             joinedload(TimetableEntry.teacher),
             joinedload(TimetableEntry.section),
             joinedload(TimetableEntry.classroom),
             joinedload(TimetableEntry.subject),
             joinedload(TimetableEntry.course)
-        ).all()
+        ).order_by(TimetableEntry.section_id, TimetableEntry.period).all()
 
-        # Create CSV
-        output = io.StringIO()
-        writer = csv.writer(output)
+        working_days_raw = AppConfig.query.filter_by(key='working_days').first()
+        if working_days_raw:
+            try:
+                working_days = json.loads(working_days_raw.value)
+            except Exception:
+                working_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+        else:
+            working_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
-        # Write header
-        writer.writerow([
-            'Day', 'Period', 'Teacher', 'Section', 'Classroom', 
-            'Subject/Course', 'Semester', 'Department'
-        ])
-
-        # Write data
+        section_groups = {}
         for entry in entries:
-            # Get semester and department info
             semester_name = "Unknown"
             department_name = "Unknown"
 
-            if hasattr(entry.section, 'department') and entry.section.department:
+            if entry.section and entry.section.department:
                 department_name = entry.section.department.name
-                if hasattr(entry.section.department, 'semester') and entry.section.department.semester:
+                if entry.section.department.semester:
                     semester_name = entry.section.department.semester.name
+            elif entry.section and entry.section.grade:
+                semester_name = entry.section.grade.name
 
-            subject_course = ""
-            if entry.subject:
-                subject_course = entry.subject.name
-            elif entry.course:
-                subject_course = entry.course.name
+            section_name = entry.section.name if entry.section else "Unknown"
+            key = (semester_name, department_name, section_name)
+            section_groups.setdefault(key, []).append(entry)
 
-            writer.writerow([
-                entry.day,
-                entry.period,
-                entry.teacher.full_name if entry.teacher else 'Unknown',
-                entry.section.name if entry.section else 'Unknown',
-                entry.classroom.room_id if entry.classroom else 'Unknown',
-                subject_course,
-                semester_name,
-                department_name
-            ])
+        settings = {
+            'start_time': (AppConfig.query.filter_by(key='start_time').first() or AppConfig(key='start_time', value='09:00')).value,
+            'period_duration': int((AppConfig.query.filter_by(key='period_duration').first() or AppConfig(key='period_duration', value='60')).value),
+        }
 
-        # Prepare response
-        output.seek(0)
-        response = make_response(output.getvalue())
-        response.headers['Content-Type'] = 'text/csv'
-        response.headers['Content-Disposition'] = 'attachment; filename=timetable.csv'
+        pdf_bytes = build_timetable_pdf(section_groups, working_days, settings)
+
+        response = make_response(pdf_bytes)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = 'attachment; filename=timetable.pdf'
 
         return response
     
     except Exception as e:
         print(f"Error exporting timetable: {e}")
         return jsonify({'error': 'Failed to export timetable'}), 500
+
+def build_timetable_pdf(section_groups, working_days, settings=None):
+    """Build a small dependency-free PDF. Uses one landscape page per timetable."""
+
+    def pdf_text(value):
+        value = str(value or "")
+        value = value.encode('latin-1', 'replace').decode('latin-1')
+        return value.replace('\\', '\\\\').replace('(', '\\(').replace(')', '\\)')
+
+    def text_cmd(x, y, text, size=9):
+        return f"BT /F1 {size} Tf {x:.1f} {y:.1f} Td ({pdf_text(text)}) Tj ET\n"
+
+    def fill_rect_cmd(x, y, w, h, color):
+        r, g, b = color
+        return f"{r:.3f} {g:.3f} {b:.3f} rg\n{x:.1f} {y:.1f} {w:.1f} {h:.1f} re f\n0 0 0 rg\n"
+
+    def line_cmd(x1, y1, x2, y2):
+        return f"{x1:.1f} {y1:.1f} m {x2:.1f} {y2:.1f} l S\n"
+
+    def rect_cmd(x, y, w, h):
+        return f"{x:.1f} {y:.1f} {w:.1f} {h:.1f} re S\n"
+
+    def wrap_text(text, max_chars=24, max_lines=2):
+        text = str(text or "").strip()
+        if not text:
+            return []
+
+        words = text.split()
+        lines = []
+        current = ""
+
+        for word in words:
+            candidate = word if not current else f"{current} {word}"
+            if len(candidate) <= max_chars:
+                current = candidate
+            else:
+                if current:
+                    lines.append(current)
+                current = word
+                if len(lines) == max_lines - 1:
+                    break
+
+        if current and len(lines) < max_lines:
+            lines.append(current)
+
+        remaining_words = words[len(" ".join(lines).split()):]
+        if remaining_words and lines:
+            lines[-1] = (lines[-1][:max_chars - 3] + "...") if len(lines[-1]) > max_chars - 3 else (lines[-1] + "...")
+
+        return lines[:max_lines]
+
+    def time_label(period):
+        settings_data = settings or {}
+        start_time = settings_data.get('start_time', '09:00')
+        period_duration = int(settings_data.get('period_duration', 60))
+        try:
+            hour, minute = [int(part) for part in start_time.split(':')[:2]]
+        except Exception:
+            hour, minute = 9, 0
+
+        start_minutes = (hour * 60) + minute + ((period - 1) * period_duration)
+        end_minutes = start_minutes + period_duration
+
+        def fmt(total_minutes):
+            return f"{(total_minutes // 60) % 24:02d}:{total_minutes % 60:02d}"
+
+        return f"{fmt(start_minutes)} - {fmt(end_minutes)}"
+
+    pages = []
+    page_width = 1191
+    page_height = 842
+    margin = 42
+
+    if not section_groups:
+        section_groups = {("Timetable", "", "No Data"): []}
+
+    for (semester_name, department_name, section_name), entries in sorted(section_groups.items()):
+        periods = sorted({entry.period for entry in entries}) or list(range(1, 9))
+        cell_map = {}
+        for entry in entries:
+            subject_name = entry.subject.name if entry.subject else entry.course.name if entry.course else "Unknown"
+            teacher_name = entry.teacher.full_name if entry.teacher else "Unknown"
+            room_name = entry.classroom.room_id if entry.classroom else "Unknown"
+            cell_map[(entry.day, entry.period)] = f"{subject_name} | {teacher_name} | {room_name}"
+
+        table_width = page_width - (margin * 2)
+        first_col_width = 118
+        day_col_width = (table_width - first_col_width) / max(len(working_days), 1)
+        table_top = 688
+        available_height = 560
+        row_height = max(62, min(94, available_height / (len(periods) + 1)))
+        table_height = row_height * (len(periods) + 1)
+        table_bottom = table_top - table_height
+
+        commands = []
+        commands.append("0.978 0.984 1 rg\n")
+        commands.append(f"0 0 {page_width} {page_height} re f\n")
+        commands.append("0 0 0 RG\n0 0 0 rg\n")
+        commands.append(fill_rect_cmd(margin, 730, table_width, 64, (0.231, 0.322, 0.627)))
+        commands.append("1 1 1 rg\n")
+        commands.append(text_cmd(margin + 22, 770, "Timetable", 24))
+        title = f"{semester_name} - {department_name} - {section_name}".strip(" -")
+        commands.append(text_cmd(margin + 22, 744, title, 13))
+        commands.append(text_cmd(page_width - 212, 756, f"{len(entries)} classes scheduled", 12))
+        commands.append("0 0 0 rg\n")
+
+        x_positions = [margin, margin + first_col_width]
+        for _ in working_days:
+            x_positions.append(x_positions[-1] + day_col_width)
+
+        commands.append(fill_rect_cmd(margin, table_top - row_height, table_width, row_height, (0.890, 0.910, 0.965)))
+        for row_index in range(1, len(periods) + 1):
+            if row_index % 2 == 0:
+                commands.append(fill_rect_cmd(margin, table_top - ((row_index + 1) * row_height), table_width, row_height, (0.992, 0.995, 1)))
+
+        commands.append("0.70 0.76 0.86 RG\n")
+        commands.append(rect_cmd(margin, table_bottom, table_width, table_height))
+
+        for x in x_positions:
+            commands.append(line_cmd(x, table_bottom, x, table_top))
+
+        for row_index in range(len(periods) + 2):
+            y = table_top - (row_index * row_height)
+            commands.append(line_cmd(margin, y, margin + table_width, y))
+
+        commands.append(text_cmd(margin + 18, table_top - 36, "Time", 13))
+        for index, day in enumerate(working_days):
+            commands.append(text_cmd(x_positions[index + 1] + 14, table_top - 36, day, 13))
+
+        for row_index, period in enumerate(periods, start=1):
+            cell_top = table_top - (row_index * row_height)
+            cell_bottom = cell_top - row_height
+            text_top = cell_top - 18
+            commands.append(text_cmd(margin + 12, cell_top - 34, time_label(period), 11))
+            for day_index, day in enumerate(working_days):
+                value = cell_map.get((day, period), "-")
+                x = x_positions[day_index + 1] + 10
+                if value == "-":
+                    commands.append(text_cmd(x + (day_col_width / 2) - 4, cell_bottom + (row_height / 2), "-", 13))
+                    continue
+
+                parts = [part.strip() for part in value.split('|')]
+                subject_lines = wrap_text(parts[0] if len(parts) > 0 else value, max_chars=24, max_lines=2)
+                teacher_lines = wrap_text(parts[1] if len(parts) > 1 else "", max_chars=22, max_lines=1)
+                room_lines = wrap_text(parts[2] if len(parts) > 2 else "", max_chars=12, max_lines=1)
+
+                line_y = text_top
+                for subject_line in subject_lines:
+                    commands.append(text_cmd(x, line_y, subject_line, 10))
+                    line_y -= 13
+
+                for teacher_line in teacher_lines:
+                    commands.append(text_cmd(x, line_y, teacher_line, 9))
+                    line_y -= 12
+
+                for room_line in room_lines:
+                    commands.append(text_cmd(x, line_y, room_line, 9))
+
+        pages.append("".join(commands))
+
+    objects = []
+    objects.append("<< /Type /Catalog /Pages 2 0 R >>")
+
+    page_objects = []
+    content_start_obj = 3 + len(pages)
+    for index in range(len(pages)):
+        page_obj_num = 3 + index
+        content_obj_num = content_start_obj + index
+        page_objects.append(page_obj_num)
+        objects.append(
+            f"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {page_width} {page_height}] "
+            f"/Resources << /Font << /F1 {content_start_obj + len(pages)} 0 R >> >> "
+            f"/Contents {content_obj_num} 0 R >>"
+        )
+
+    kids = " ".join(f"{obj_num} 0 R" for obj_num in page_objects)
+    objects.insert(1, f"<< /Type /Pages /Kids [{kids}] /Count {len(pages)} >>")
+
+    for page in pages:
+        stream = page.encode('latin-1', 'replace')
+        objects.append(f"<< /Length {len(stream)} >>\nstream\n{page}endstream")
+
+    objects.append("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>")
+
+    pdf = bytearray(b"%PDF-1.4\n")
+    offsets = [0]
+    for index, obj in enumerate(objects, start=1):
+        offsets.append(len(pdf))
+        pdf.extend(f"{index} 0 obj\n{obj}\nendobj\n".encode('latin-1', 'replace'))
+
+    xref_offset = len(pdf)
+    pdf.extend(f"xref\n0 {len(objects) + 1}\n".encode('latin-1'))
+    pdf.extend(b"0000000000 65535 f \n")
+    for offset in offsets[1:]:
+        pdf.extend(f"{offset:010d} 00000 n \n".encode('latin-1'))
+    pdf.extend(
+        f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\nstartxref\n{xref_offset}\n%%EOF\n".encode('latin-1')
+    )
+    return bytes(pdf)
 

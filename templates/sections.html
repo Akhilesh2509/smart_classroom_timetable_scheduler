@@ -34,7 +34,7 @@
             
             <!-- Add Button -->
             <div class="flex justify-end">
-                <button @click="openSectionModal()" class="btn-primary px-6 py-3 text-sm font-semibold inline-flex items-center" :disabled="!filters.secondary">
+                <button id="add-section-btn" @click="openSectionModal()" class="btn-primary px-6 py-3 text-sm font-semibold inline-flex items-center" :disabled="!filters.secondary">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                     </svg>
@@ -89,7 +89,7 @@
                         <p class="text-sm text-gray-400 mt-1">Manage student enrollments and information</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <button @click="openStudentModal()" class="btn-secondary px-4 py-2 text-sm font-medium inline-flex items-center">
+                        <button id="add-student-btn" @click="openStudentModal()" class="btn-secondary px-4 py-2 text-sm font-medium inline-flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                             </svg>

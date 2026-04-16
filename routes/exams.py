@@ -2,7 +2,7 @@ import json
 import os
 import requests
 from datetime import datetime, timedelta
-from flask import Blueprint, jsonify, request, session, redirect, url_for, render_template, g, send_file
+from flask import Blueprint, jsonify, request, session, redirect, url_for, render_template, g, send_file, make_response
 from sqlalchemy.orm import joinedload
 from sqlalchemy import exc
 
@@ -143,10 +143,17 @@ def generate_exam_schedule():
         # Get classrooms data
         classrooms = Classroom.query.all()
         
-        # Generate prompt for Gemini
+        if not os.getenv('GEMINI_API_KEY'):
+            schedule_data = generate_local_exam_schedule(exams, students, classrooms)
+            db.session.commit()
+            log_activity('info', f"Local exam schedule generated for {len(exams)} exams.")
+            return jsonify({
+                "message": "Exam schedule generated successfully.",
+                "schedule": schedule_data.get('exam_schedule', []),
+                "changes": schedule_data.get('explanation_of_changes', [])
+            })
+
         prompt = generate_exam_schedule_prompt(exams, students, classrooms)
-        
-        # Call Gemini API
         schedule_data = call_gemini_api(prompt)
         
         if schedule_data and 'exam_schedule' in schedule_data:
@@ -195,6 +202,105 @@ def generate_exam_schedule():
         db.session.rollback()
         log_activity('error', f'Exam schedule generation failed: {e}')
         return jsonify({"message": f"Failed to generate exam schedule: {str(e)}"}), 500
+
+def generate_local_exam_schedule(exams, students, classrooms):
+    """Generate a deterministic schedule and seating plan without an external AI key."""
+    if not classrooms:
+        raise ValueError("No classrooms available for exam scheduling.")
+
+    start_date = datetime.now().replace(hour=10, minute=0, second=0, microsecond=0) + timedelta(days=1)
+    schedule = []
+    seating_plan = []
+
+    for exam_index, exam in enumerate(sorted(exams, key=lambda item: item.id)):
+        exam.date = start_date + timedelta(days=exam_index)
+        exam.duration = exam.duration or 180
+
+        relevant_students = students_for_exam(exam, students)
+        if not relevant_students:
+            relevant_students = students
+
+        ExamSeating.query.filter_by(exam_id=exam.id).delete()
+
+        remaining_students = list(relevant_students)
+        assigned_rooms = []
+
+        for classroom in sorted(classrooms, key=lambda room: room.room_id):
+            if not remaining_students:
+                break
+
+            assigned_rooms.append(classroom.room_id)
+            room_map = []
+            seats_in_room = min(classroom.capacity, len(remaining_students))
+            columns = 5
+            rows = max(1, (seats_in_room + columns - 1) // columns)
+
+            for row_idx in range(rows):
+                row = []
+                for col_idx in range(columns):
+                    if remaining_students and len(row) + (row_idx * columns) < seats_in_room:
+                        student = remaining_students.pop(0)
+                        seat_number = f"{row_idx + 1}-{col_idx + 1}"
+                        db.session.add(ExamSeating(
+                            exam_id=exam.id,
+                            student_id=student.id,
+                            classroom_id=classroom.id,
+                            seat_number=seat_number
+                        ))
+                        row.append(student.id)
+                    else:
+                        row.append(None)
+                room_map.append(row)
+
+            seating_plan.append({
+                "exam_id": exam.id,
+                "room_id": classroom.room_id,
+                "map": room_map
+            })
+
+        schedule.append({
+            "exam_id": exam.id,
+            "exam_name": exam.name,
+            "date": exam.date.isoformat(),
+            "duration": exam.duration,
+            "rooms_assigned": assigned_rooms
+        })
+
+    return {
+        "exam_schedule": schedule,
+        "seating_plan": seating_plan,
+        "explanation_of_changes": [
+            "Generated locally because GEMINI_API_KEY is not configured.",
+            "Scheduled one exam per day at 10:00 AM and assigned students by classroom capacity."
+        ]
+    }
+
+def students_for_exam(exam, students):
+    """Best-effort class-wise student selection from the current schema."""
+    matching_students = []
+    course_department_id = exam.course.department_id if exam.course else None
+
+    for student in students:
+        section = student.section
+        if not section:
+            continue
+
+        if course_department_id and section.department_id != course_department_id:
+            continue
+
+        if section.name.lower() in exam.name.lower():
+            matching_students.append(student)
+
+    if matching_students:
+        return matching_students
+
+    if course_department_id:
+        return [
+            student for student in students
+            if student.section and student.section.department_id == course_department_id
+        ]
+
+    return students
 
 def generate_exam_schedule_prompt(exams, students, classrooms):
     """Generate prompt for Gemini API to create exam schedule."""
@@ -398,3 +504,179 @@ def export_exam_schedule(exam_id):
     # This would integrate with a PDF generation library like ReportLab
     # For now, return a placeholder response
     return jsonify({"message": "Export functionality will be implemented with PDF generation library"})
+
+@exams_bp.route('/api/export')
+def export_all_exams():
+    """Export all exams and seating summaries as a PDF."""
+    if 'user_id' not in session:
+        return redirect(url_for('main.login'))
+
+    try:
+        exams = Exam.query.options(
+            joinedload(Exam.subject),
+            joinedload(Exam.course),
+            joinedload(Exam.seating_plans).joinedload(ExamSeating.student),
+            joinedload(Exam.seating_plans).joinedload(ExamSeating.classroom)
+        ).order_by(Exam.date, Exam.id).all()
+
+        pdf_bytes = build_exam_pdf(exams)
+        response = make_response(pdf_bytes)
+        response.headers['Content-Type'] = 'application/pdf'
+        response.headers['Content-Disposition'] = 'attachment; filename=exam-schedule.pdf'
+        return response
+    except Exception as e:
+        return jsonify({"message": f"Failed to export exams: {e}"}), 500
+
+def build_exam_pdf(exams):
+    """Build a dependency-free PDF for exam schedules."""
+
+    def pdf_text(value):
+        value = str(value or "")
+        value = value.encode('latin-1', 'replace').decode('latin-1')
+        return value.replace('\\', '\\\\').replace('(', '\\(').replace(')', '\\)')
+
+    def text_cmd(x, y, text, size=9):
+        return f"BT /F1 {size} Tf {x:.1f} {y:.1f} Td ({pdf_text(text)}) Tj ET\n"
+
+    def line_cmd(x1, y1, x2, y2):
+        return f"{x1:.1f} {y1:.1f} m {x2:.1f} {y2:.1f} l S\n"
+
+    def rect_cmd(x, y, w, h):
+        return f"{x:.1f} {y:.1f} {w:.1f} {h:.1f} re S\n"
+
+    def fill_rect_cmd(x, y, w, h, color):
+        r, g, b = color
+        return f"{r:.3f} {g:.3f} {b:.3f} rg\n{x:.1f} {y:.1f} {w:.1f} {h:.1f} re f\n0 0 0 rg\n"
+
+    def clip(value, max_chars):
+        value = str(value or "")
+        return value if len(value) <= max_chars else value[:max_chars - 3] + "..."
+
+    def exam_subject(exam):
+        return exam.subject.name if exam.subject else exam.course.name if exam.course else "N/A"
+
+    page_width = 842
+    page_height = 595
+    margin = 34
+    pages = []
+
+    if not exams:
+        exams = []
+
+    def add_exam_page(exam, seating_rows, page_number, total_pages):
+        commands = []
+        commands.append("0.965 0.975 1 rg\n")
+        commands.append(f"0 0 {page_width} {page_height} re f\n")
+        commands.append("0 0 0 RG\n0 0 0 rg\n")
+        commands.append(fill_rect_cmd(margin, 520, page_width - (margin * 2), 44, (0.231, 0.322, 0.627)))
+        commands.append("1 1 1 rg\n")
+        commands.append(text_cmd(margin + 18, 547, "Exam Schedule", 20))
+        commands.append(text_cmd(page_width - 150, 542, f"Page {page_number}/{total_pages}", 9))
+        commands.append("0 0 0 rg\n")
+
+        if not exam:
+            commands.append(text_cmd(margin + 18, 480, "No exams available.", 14))
+            return "".join(commands)
+
+        date_text = exam.date.strftime("%d %b %Y, %I:%M %p") if exam.date else "Not scheduled"
+        commands.append(text_cmd(margin + 18, 492, clip(exam.name, 72), 15))
+        commands.append(text_cmd(margin + 18, 468, f"Subject/Course: {clip(exam_subject(exam), 55)}", 10))
+        commands.append(text_cmd(margin + 18, 450, f"Date & Time: {date_text}", 10))
+        commands.append(text_cmd(margin + 18, 432, f"Duration: {exam.duration} minutes    Type: {exam.type.title()}", 10))
+
+        table_x = margin + 18
+        table_y = 390
+        table_w = page_width - (margin * 2) - 36
+        row_h = 22
+        commands.append(fill_rect_cmd(table_x, table_y, table_w, row_h, (0.890, 0.910, 0.965)))
+        commands.append("0.68 0.72 0.82 RG\n")
+        commands.append(rect_cmd(table_x, table_y - (row_h * max(len(seating_rows), 1)), table_w, row_h * (max(len(seating_rows), 1) + 1)))
+        commands.append(text_cmd(table_x + 12, table_y + 9, "Room", 10))
+        commands.append(text_cmd(table_x + 90, table_y + 9, "Seat", 10))
+        commands.append(text_cmd(table_x + 160, table_y + 9, "Student", 10))
+        commands.append(text_cmd(table_x + 380, table_y + 9, "Class / Section", 10))
+        commands.append(text_cmd(table_x + 560, table_y + 9, "Subject", 10))
+
+        if seating_rows:
+            for index, row in enumerate(seating_rows, start=1):
+                y = table_y - (index * row_h)
+                if index % 2 == 0:
+                    commands.append(fill_rect_cmd(table_x, y, table_w, row_h, (0.985, 0.988, 1)))
+                commands.append(line_cmd(table_x, y, table_x + table_w, y))
+                commands.append(text_cmd(table_x + 12, y + 7, row["room"], 8))
+                commands.append(text_cmd(table_x + 90, y + 7, row["seat"], 8))
+                commands.append(text_cmd(table_x + 160, y + 7, clip(row["student"], 32), 8))
+                commands.append(text_cmd(table_x + 380, y + 7, clip(row["section"], 25), 8))
+                commands.append(text_cmd(table_x + 560, y + 7, clip(row["subject"], 25), 8))
+        else:
+            commands.append(text_cmd(table_x + 12, table_y - 16, "No seating plan generated yet. Click Generate Schedule first.", 9))
+
+        return "".join(commands)
+
+    if not exams:
+        pages.append(add_exam_page(None, [], 1, 1))
+    else:
+        for exam in exams:
+            rows = []
+            for seating in sorted(exam.seating_plans, key=lambda item: (
+                item.classroom.room_id if item.classroom else "",
+                item.seat_number or ""
+            )):
+                student = seating.student
+                section = student.section.name if student and student.section else "N/A"
+                rows.append({
+                    "room": seating.classroom.room_id if seating.classroom else "Unknown",
+                    "seat": seating.seat_number or "-",
+                    "student": student.full_name if student else f"Student {seating.student_id}",
+                    "section": section,
+                    "subject": exam_subject(exam)
+                })
+
+            if not rows:
+                pages.append(add_exam_page(exam, [], 1, 1))
+                continue
+
+            rows_per_page = 15
+            chunks = [rows[index:index + rows_per_page] for index in range(0, len(rows), rows_per_page)]
+            for page_index, chunk in enumerate(chunks, start=1):
+                pages.append(add_exam_page(exam, chunk, page_index, len(chunks)))
+
+    objects = []
+    objects.append("<< /Type /Catalog /Pages 2 0 R >>")
+    page_objects = []
+    content_start_obj = 3 + len(pages)
+
+    for index in range(len(pages)):
+        page_obj_num = 3 + index
+        content_obj_num = content_start_obj + index
+        page_objects.append(page_obj_num)
+        objects.append(
+            f"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 {page_width} {page_height}] "
+            f"/Resources << /Font << /F1 {content_start_obj + len(pages)} 0 R >> >> "
+            f"/Contents {content_obj_num} 0 R >>"
+        )
+
+    kids = " ".join(f"{obj_num} 0 R" for obj_num in page_objects)
+    objects.insert(1, f"<< /Type /Pages /Kids [{kids}] /Count {len(pages)} >>")
+
+    for page in pages:
+        stream = page.encode('latin-1', 'replace')
+        objects.append(f"<< /Length {len(stream)} >>\nstream\n{page}endstream")
+
+    objects.append("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>")
+
+    pdf = bytearray(b"%PDF-1.4\n")
+    offsets = [0]
+    for index, obj in enumerate(objects, start=1):
+        offsets.append(len(pdf))
+        pdf.extend(f"{index} 0 obj\n{obj}\nendobj\n".encode('latin-1', 'replace'))
+
+    xref_offset = len(pdf)
+    pdf.extend(f"xref\n0 {len(objects) + 1}\n".encode('latin-1'))
+    pdf.extend(b"0000000000 65535 f \n")
+    for offset in offsets[1:]:
+        pdf.extend(f"{offset:010d} 00000 n \n".encode('latin-1'))
+    pdf.extend(
+        f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\nstartxref\n{xref_offset}\n%%EOF\n".encode('latin-1')
+    )
+    return bytes(pdf)

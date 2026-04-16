@@ -117,6 +117,14 @@ Admin Dashboard
                 class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold transition">
                 Generate Fake Data
             </button>
+            <button id="reset-dashboard-btn"
+                class="ml-3 bg-gray-900 hover:bg-black text-white px-4 py-2 rounded-lg font-semibold transition">
+                Reset Everything
+            </button>
+        </div>
+        <div id="faker-log-panel" class="hidden mt-4 rounded-xl border border-gray-200 bg-gray-950 text-green-200 p-4 font-mono text-sm max-h-64 overflow-y-auto">
+            <div class="text-gray-400 mb-2">Terminal output</div>
+            <div id="faker-log-output" class="space-y-1 whitespace-pre-wrap"></div>
         </div>
 
         <!-- FIXED HERE -->
@@ -253,5 +261,87 @@ Admin Dashboard
 
     loadPerformance();
     setInterval(loadPerformance, 5000);
+
+    const fakeDataBtn = document.getElementById('faker-dashboard-btn');
+    const resetBtn = document.getElementById('reset-dashboard-btn');
+    if (fakeDataBtn) {
+        fakeDataBtn.addEventListener('click', async () => {
+            if (!confirm('This will replace the current database with fresh sample data. Continue?')) return;
+
+            fakeDataBtn.disabled = true;
+            fakeDataBtn.textContent = 'Generating...';
+            const logPanel = document.getElementById('faker-log-panel');
+            const logOutput = document.getElementById('faker-log-output');
+            logPanel.classList.remove('hidden');
+            logOutput.innerHTML = '';
+
+            const appendLog = (message, isError = false) => {
+                const row = document.createElement('div');
+                row.className = isError ? 'text-red-300' : 'text-green-200';
+                row.textContent = message;
+                logOutput.appendChild(row);
+                logPanel.scrollTop = logPanel.scrollHeight;
+            };
+
+            try {
+                const response = await fetch('/generate-fake-data', { method: 'POST' });
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    buffer += decoder.decode(value, { stream: true });
+                    const events = buffer.split('\n\n');
+                    buffer = events.pop();
+
+                    for (const rawEvent of events) {
+                        const dataLine = rawEvent.split('\n').find(line => line.startsWith('data: '));
+                        if (!dataLine) continue;
+
+                        const payload = JSON.parse(dataLine.slice(6));
+                        if (payload.type === 'log') appendLog(payload.message);
+                        if (payload.type === 'error') throw new Error(payload.message || 'Failed to generate fake data');
+                        if (payload.type === 'done') {
+                            appendLog('Redirecting to login...');
+                            setTimeout(() => {
+                                window.location.href = payload.redirect || '/login';
+                            }, 900);
+                        }
+                    }
+                }
+            } catch (error) {
+                appendLog('Failed to generate fake data: ' + error.message, true);
+                fakeDataBtn.disabled = false;
+                fakeDataBtn.textContent = 'Generate Fake Data';
+            }
+        });
+    }
+
+    if (resetBtn) {
+        resetBtn.addEventListener('click', async () => {
+            if (!confirm('This will delete all data and return the app to setup mode. Continue?')) return;
+
+            resetBtn.disabled = true;
+            resetBtn.textContent = 'Resetting...';
+
+            try {
+                const response = await fetch('/reset', { method: 'POST' });
+                const result = await response.json();
+
+                if (!response.ok || result.status !== 'success') {
+                    throw new Error(result.message || 'Failed to reset system');
+                }
+
+                window.location.href = result.redirect || '/setup';
+            } catch (error) {
+                alert(error.message || 'Failed to reset system');
+                resetBtn.disabled = false;
+                resetBtn.textContent = 'Reset Everything';
+            }
+        });
+    }
 </script>
 {% endblock %}

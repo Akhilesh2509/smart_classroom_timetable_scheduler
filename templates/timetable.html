@@ -203,6 +203,12 @@ tr:hover {
                         </svg>
                         Export
                     </button>
+                    <button id="clear-timetable-btn" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-2 rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-200 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-7 0a1 1 0 001-1V5a1 1 0 011-1h4a1 1 0 011 1v1a1 1 0 001 1"></path>
+                        </svg>
+                        Clear
+                    </button>
                 </div>
             </div>
         </div>
@@ -210,12 +216,8 @@ tr:hover {
 
     <!-- Timetable Display -->
     <div class="glass-card p-6">
-        <div class="mb-4 flex items-center justify-between">
+        <div class="mb-4">
             <h2 class="text-2xl font-semibold text-gray-200">Timetable</h2>
-            <div class="flex items-center gap-2 text-sm text-gray-400">
-                <span id="last-generated">Last generated: Never</span>
-                <span id="generation-status" class="px-2 py-1 rounded-full text-xs"></span>
-            </div>
         </div>
 
         <!-- Loading State -->
@@ -373,14 +375,16 @@ tr:hover {
 {% endblock %}
 
 {% block scripts %}
+<script id="timetable-settings" type="application/json">{{ settings | tojson | safe }}</script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const APP_MODE = '{{ g.app_mode }}';
-    const SETTINGS = {{ settings | tojson | safe }};
+    const SETTINGS = JSON.parse(document.getElementById('timetable-settings').textContent);
     
     // Element references
     const generateBtn = document.getElementById('generate-btn');
     const exportBtn = document.getElementById('export-btn');
+    const clearTimetableBtn = document.getElementById('clear-timetable-btn');
     const generateEmptyBtn = document.getElementById('generate-empty-btn');
     const timetablesContainer = document.getElementById('timetables-container');
     const emptyState = document.getElementById('empty-state');
@@ -392,21 +396,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const sectionSelect = document.getElementById('section-select');
     const clearFilterBtn = document.getElementById('clear-filter-btn');
     const generationModal = document.getElementById('generation-modal');
-    const progressBar = document.getElementById('progress-bar');
-    const progressText = document.getElementById('progress-text');
     const toast = document.getElementById('toast');
     
     // State
     let timetableData = [];
+    let sections = [];
     
     // Initialize
     loadTimetableData();
     setupEventListeners();
     
     function setupEventListeners() {
-        generateBtn.addEventListener('click', generateTimetable);
-        generateEmptyBtn.addEventListener('click', generateTimetable);
-        exportBtn.addEventListener('click', exportTimetable);
+        if (generateBtn) generateBtn.addEventListener('click', generateTimetable);
+        if (generateEmptyBtn) generateEmptyBtn.addEventListener('click', generateTimetable);
+        if (exportBtn) exportBtn.addEventListener('click', exportTimetable);
+        if (clearTimetableBtn) clearTimetableBtn.addEventListener('click', clearTimetable);
         
         // Filter controls - auto-apply on change
         semesterSelect.addEventListener('change', () => {
@@ -486,7 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sectionGroups[key].entries.push(entry);
         });
         
-        const sections = Object.values(sectionGroups).sort((a, b) => {
+        sections = Object.values(sectionGroups).sort((a, b) => {
             if (a.semester !== b.semester) return a.semester.localeCompare(b.semester);
             if (a.department !== b.department) return a.department.localeCompare(b.department);
             return a.section.localeCompare(b.section);
@@ -715,31 +719,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 800);
     }
     
-    function simulateProgress() {
-        const steps = [
-            { progress: 20, text: 'Analyzing constraints...' },
-            { progress: 40, text: 'Optimizing schedule...' },
-            { progress: 60, text: 'Assigning teachers...' },
-            { progress: 80, text: 'Allocating classrooms...' },
-            { progress: 100, text: 'Finalizing timetable...' }
-        ];
-        
-        let currentStep = 0;
-        const interval = setInterval(() => {
-            if (currentStep < steps.length) {
-                const step = steps[currentStep];
-                progressBar.style.width = step.progress + '%';
-                progressText.textContent = step.text;
-                currentStep++;
-            } else {
-                clearInterval(interval);
-            }
-        }, 1000);
-    }
-    
     function exportTimetable() {
-        // Implement export functionality
-        showToast('Export functionality coming soon!', 'info');
+        showToast('Exporting timetable...', 'info');
+        window.location.href = '/api/export_timetable';
+    }
+
+    async function clearTimetable() {
+        if (!confirm('Clear the generated timetable?')) return;
+
+        try {
+            const response = await fetch('/api/clear_timetable', { method: 'POST' });
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || result.message || 'Failed to clear timetable');
+            }
+
+            showToast(result.message || 'Timetable cleared successfully', 'success');
+            timetableData = [];
+            updateStatistics();
+            showEmptyState();
+            timetablesContainer.innerHTML = '';
+        } catch (error) {
+            showToast('Failed to clear timetable: ' + error.message, 'error');
+        }
     }
     
     function updateStatistics() {
@@ -990,8 +993,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (cellData.length > 0) {
                             const entry = cellData[0];
                             const subjectName = entry.subject_name || entry.course_name || 'Unknown';
-                            const teacherName = entry.teacher || 'Unknown';
-                            const roomName = entry.classroom || 'Unknown';
+                            const teacherName = entry.teacher_name || 'Unknown';
+                            const roomName = entry.classroom_name || 'Unknown';
                             
                             cell.innerHTML = `
                                 <div class="text-sm font-medium text-blue-300">${subjectName}</div>

@@ -3,7 +3,7 @@ import os
 import sys
 from faker import Faker
 import random
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 
 # Add the project root to the Python path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -23,16 +23,13 @@ def clear_database():
     try:
         # First delete all timetable entries
         db.session.query(TimetableEntry).delete()
-        db.session.commit()
         
         # Delete exam related data
         db.session.query(ExamSeating).delete()
         db.session.query(Exam).delete()
-        db.session.commit()
         
         # Delete students
         db.session.query(Student).delete()
-        db.session.commit()
         
         # Delete teacher-course associations first
         from sqlalchemy import text
@@ -41,51 +38,39 @@ def clear_database():
             db.session.execute(text("DELETE FROM teacher_school_subjects"))
         except:
             pass
-        db.session.commit()
         
         # Delete teachers
         db.session.query(Teacher).delete()
-        db.session.commit()
         
         # Delete sections
         db.session.query(StudentSection).delete()
-        db.session.commit()
         
         # Delete classrooms
         db.session.query(Classroom).delete()
-        db.session.commit()
         
         # Delete subjects
         db.session.query(Subject).delete()
-        db.session.commit()
         
         # Delete courses
         db.session.query(Course).delete()
-        db.session.commit()
         
         # Delete streams
         db.session.query(Stream).delete()
-        db.session.commit()
         
         # Delete grades
         db.session.query(Grade).delete()
-        db.session.commit()
         
         # Delete departments
         db.session.query(Department).delete()
-        db.session.commit()
         
         # Delete semesters
         db.session.query(Semester).delete()
-        db.session.commit()
         
         # Delete school groups
         db.session.query(SchoolGroup).delete()
-        db.session.commit()
         
         # Delete users last
         db.session.query(User).delete()
-        db.session.commit()
         
         # Delete AppConfig
         db.session.query(AppConfig).delete()
@@ -105,11 +90,13 @@ def clear_database():
 def create_realistic_data():
     """Create realistic school/college data"""
     print("🏗️ Creating realistic data...")
+    teacher_password_hash = generate_password_hash("teacher123")
+    student_password_hash = generate_password_hash("student123")
+    admin_password_hash = generate_password_hash("admin123")
     
     # Create school group
     school_group = SchoolGroup(name="ADYPU")
     db.session.add(school_group)
-    db.session.flush()
     
     # Create semesters
     semesters = []
@@ -117,7 +104,6 @@ def create_realistic_data():
         semester = Semester(name=f"SEM {i}")
         db.session.add(semester)
         semesters.append(semester)
-    db.session.flush()
     
     # Create departments with realistic names
     department_names = [
@@ -134,11 +120,9 @@ def create_realistic_data():
     departments = []
     for i, name in enumerate(department_names):
         # Assign each department to 2 semesters
-        semester_id = semesters[i % len(semesters)].id
-        dept = Department(name=name, semester_id=semester_id)
+        dept = Department(name=name, semester=semesters[i % len(semesters)])
         db.session.add(dept)
         departments.append(dept)
-    db.session.flush()
     
     # Create realistic subjects for each department
     subjects_data = {
@@ -198,22 +182,19 @@ def create_realistic_data():
         dept_name = dept.name
         if dept_name in subjects_data:
             for subject_name, code, hours, is_elective in subjects_data[dept_name]:
-                # Create stream for this department
-                stream = Stream(name=f"{dept_name} Stream", group_id=school_group.id)
+                stream = Stream(name=f"{dept_name} Stream", group=school_group)
                 db.session.add(stream)
-                db.session.flush()
                 
                 subject = Subject(
                     name=subject_name,
                     code=code,
                     weekly_hours=hours,
                     is_elective=is_elective,
-                    stream_id=stream.id
+                    stream=stream
                 )
                 db.session.add(subject)
                 subjects.append(subject)
     
-    db.session.flush()
     
     # Create courses for each department
     courses = []
@@ -226,7 +207,7 @@ def create_realistic_data():
                     code=code,
                     credits=hours,
                     course_type="Core" if not is_elective else "Elective",
-                    department_id=dept.id
+                    department=dept
                 )
                 db.session.add(course)
                 courses.append(course)
@@ -236,10 +217,9 @@ def create_realistic_data():
     # Create grades
     grades = []
     for i in range(1, 9):  # 8 grades
-        grade = Grade(name=f"Grade {i}", group_id=school_group.id)
+        grade = Grade(name=f"Grade {i}", group=school_group)
         db.session.add(grade)
         grades.append(grade)
-    db.session.flush()
     
     # Create sections for each department
     sections = []
@@ -248,8 +228,8 @@ def create_realistic_data():
             section = StudentSection(
                 name=f"Section {section_letter}",
                 capacity=30,
-                grade_id=grades[dept.id % len(grades)].id,
-                department_id=dept.id
+                grade=grades[len(sections) % len(grades)],
+                department=dept
             )
             db.session.add(section)
             sections.append(section)
@@ -288,30 +268,28 @@ def create_realistic_data():
         user = User(
             username=f"teacher{i+1:02d}",
             email=f"teacher{i+1:02d}@adypu.edu.in",
-            password=generate_password_hash("teacher123"),  # Hashed password
+            password=teacher_password_hash,
             role="teacher"
         )
-        db.session.add(user)
-        db.session.flush()
-        
         teacher = Teacher(
-            user_id=user.id,
+            user=user,
             full_name=fake.name(),
             max_weekly_hours=random.randint(20, 30)
         )
-        db.session.add(teacher)
+        db.session.add_all([user, teacher])
         teachers.append(teacher)
     
     db.session.flush()
     
     # Assign teachers to courses (ensure proper subject-department matching)
     teacher_course_assignments = []
+    teacher_loads = {teacher.id: 0 for teacher in teachers}
     for course in courses:
-        # Find teachers who can teach this course (random assignment for now)
-        available_teachers = [t for t in teachers if len([tc for tc in teacher_course_assignments if tc[0] == t.id]) < 5]
+        available_teachers = [teacher for teacher in teachers if teacher_loads[teacher.id] < 5]
         if available_teachers:
             teacher = random.choice(available_teachers)
             teacher_course_assignments.append((teacher.id, course.id))
+            teacher_loads[teacher.id] += 1
     
     # Insert teacher-course assignments into database
     if teacher_course_assignments:
@@ -329,30 +307,42 @@ def create_realistic_data():
         user = User(
             username=f"student{i+1:03d}",
             email=f"student{i+1:03d}@adypu.edu.in",
-            password=generate_password_hash("student123"),  # Hashed password
+            password=student_password_hash,
             role="student"
         )
-        db.session.add(user)
-        db.session.flush()
-        
-        # Assign student to a random section
         section = random.choice(sections)
         student = Student(
-            user_id=user.id,
+            user=user,
             full_name=fake.name(),
-            section_id=section.id
+            section=section
         )
-        db.session.add(student)
+        db.session.add_all([user, student])
         students.append(student)
     
     db.session.flush()
+
+    # Create class-wise exams so generated fake data can be scheduled immediately.
+    exams = []
+    exam_start = datetime.now().replace(hour=10, minute=0, second=0, microsecond=0) + timedelta(days=7)
+    for section in sections:
+        section_courses = [course for course in courses if course.department_id == section.department_id]
+        for course_index, course in enumerate(section_courses[:3]):
+            exam = Exam(
+                name=f"{section.name} - {course.name} Final",
+                date=exam_start + timedelta(days=course_index),
+                duration=180,
+                type="final",
+                course_id=course.id
+            )
+            db.session.add(exam)
+            exams.append(exam)
     
     # Create admin user
     if not User.query.filter_by(username="admin").first():
         admin_user = User(
             username="admin",
             email="admin@adypu.edu.in",
-            password=generate_password_hash("admin123"),
+            password=admin_password_hash,
             role="admin"
         )
         db.session.add(admin_user)
@@ -396,7 +386,8 @@ def create_realistic_data():
         'sections': sections,
         'classrooms': classrooms,
         'teachers': teachers,
-        'students': students
+        'students': students,
+        'exams': exams
     }
 
 def main():

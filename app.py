@@ -12,6 +12,7 @@ def create_app(config_class=Config):
     # --- App Initialization ---
     app = Flask(__name__)
     app.config.from_object(config_class)
+    app.config.setdefault('FAKE_DATA_RUNNING', False)
 
     # --- Initialize Extensions ---
     db.init_app(app)
@@ -48,10 +49,14 @@ def create_app(config_class=Config):
     # --- Application Hooks ---
     @app.before_request
     def check_setup():
+        if app.config.get('FAKE_DATA_RUNNING'):
+            return
+
         if request.endpoint and (
             'static' in request.endpoint or 
             'main.setup' in request.endpoint or
-            'main.generate_fake_data' in request.endpoint
+            'main.generate_fake_data' in request.endpoint or
+            'main.reset_system' in request.endpoint
         ):
             return
 
