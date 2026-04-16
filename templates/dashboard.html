@@ -87,6 +87,41 @@ Admin Dashboard
     .dark .system-conflict-card p:last-child {
         color: #fecaca !important;
     }
+
+    .conflict-list-card {
+        border: 1px solid #fecaca;
+        background: #fff7f7;
+    }
+
+    .conflict-badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 9999px;
+        padding: 0.2rem 0.65rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: capitalize;
+    }
+
+    .conflict-badge.teacher {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .conflict-badge.classroom {
+        background: #ede9fe;
+        color: #6d28d9;
+    }
+
+    .conflict-badge.section {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .conflict-change-card {
+        border: 1px dashed #cbd5e1;
+        background: #f8fafc;
+    }
 </style>
 
 <div class="space-y-8">
@@ -199,12 +234,31 @@ Admin Dashboard
                 <p class="text-xl font-bold" id="response_time">0 sec</p>
             </div>
 
-            <div class="system-conflict-card bg-red-100 p-4 rounded-xl shadow col-span-2">
+            <button type="button" id="view-conflicts-btn" class="system-conflict-card bg-red-100 p-4 rounded-xl shadow col-span-2 text-left transition hover:shadow-md">
                 <p class="text-sm text-red-500">Conflicts Detected</p>
                 <p class="text-xl font-bold text-red-700" id="conflicts">0</p>
-            </div>
+                <p class="text-xs text-red-500 mt-1">Click to inspect conflict details</p>
+            </button>
 
         </div>
+    </div>
+
+    <div id="conflict-panel" class="glass-card p-6 rounded-2xl hidden">
+        <div class="flex items-center justify-between gap-4 mb-4">
+            <div>
+                <h3 class="text-xl font-semibold text-gray-800">Conflict Details</h3>
+                <p class="text-sm text-gray-500">See which teachers, classrooms, or sections overlap at the same time.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button type="button" id="auto-fix-conflicts-btn" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition">
+                    Auto-Fix Conflicts
+                </button>
+                <button type="button" id="close-conflict-panel" class="text-sm font-semibold text-gray-500 hover:text-gray-800 transition">Close</button>
+            </div>
+        </div>
+        <div id="conflict-summary" class="text-sm text-gray-500 mb-4"></div>
+        <div id="conflict-fix-result" class="hidden mb-4"></div>
+        <div id="conflict-list" class="space-y-3"></div>
     </div>
 
     <div class="glass-card p-6 rounded-2xl mt-6">
@@ -216,6 +270,89 @@ Admin Dashboard
 
 <script>
     let chart;
+    let conflictData = [];
+
+    function renderConflictPanel(conflicts) {
+        const panel = document.getElementById('conflict-panel');
+        const summary = document.getElementById('conflict-summary');
+        const list = document.getElementById('conflict-list');
+        const resultBox = document.getElementById('conflict-fix-result');
+
+        if (!panel || !summary || !list || !resultBox) return;
+
+        panel.classList.remove('hidden');
+        list.innerHTML = '';
+        resultBox.classList.add('hidden');
+        resultBox.innerHTML = '';
+
+        if (!conflicts.length) {
+            summary.textContent = 'No timetable conflicts were found.';
+            list.innerHTML = '<div class="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-700">Everything looks clean right now.</div>';
+            return;
+        }
+
+        summary.textContent = `${conflicts.length} conflict groups found across teachers, classrooms, and sections.`;
+
+        conflicts.forEach(conflict => {
+            const card = document.createElement('div');
+            card.className = 'conflict-list-card rounded-xl p-4';
+
+            const entryLines = conflict.entries.map(entry =>
+                `<li class="text-sm text-gray-700">${entry.subject} | ${entry.section} | ${entry.teacher} | ${entry.classroom}</li>`
+            ).join('');
+
+            card.innerHTML = `
+                <div class="flex flex-wrap items-center gap-3 mb-2">
+                    <span class="conflict-badge ${conflict.type}">${conflict.type}</span>
+                    <span class="text-sm font-semibold text-gray-900">${conflict.entity}</span>
+                    <span class="text-sm text-gray-500">${conflict.day}, Period ${conflict.period}</span>
+                    <span class="text-sm text-red-600 font-semibold">${conflict.count} overlapping entries</span>
+                </div>
+                <ul class="space-y-1">${entryLines}</ul>
+            `;
+
+            list.appendChild(card);
+        });
+    }
+
+    function renderFixResult(result) {
+        const resultBox = document.getElementById('conflict-fix-result');
+        if (!resultBox) return;
+
+        const changes = (result.changes || []).map(change => `
+            <div class="conflict-change-card rounded-lg p-3 text-sm text-gray-700">
+                Entry #${change.entry_id}: ${change.from_day} P${change.from_period} -> ${change.to_day} P${change.to_period}
+            </div>
+        `).join('');
+
+        resultBox.className = 'mb-4 rounded-xl border border-blue-200 bg-blue-50 p-4';
+        resultBox.innerHTML = `
+            <div class="text-sm font-semibold text-blue-800">Auto-fix completed</div>
+            <div class="text-sm text-blue-700 mt-1">
+                Moved ${result.moved} entries. Remaining conflicts: ${result.remaining_conflicts}. Unresolved entries: ${result.unresolved}.
+            </div>
+            ${changes ? `<div class="mt-3 space-y-2">${changes}</div>` : ''}
+        `;
+    }
+
+    async function loadConflictDetails(openPanel = false) {
+        try {
+            const res = await fetch('/analytics/conflict-details');
+            if (!res.ok) throw new Error('Failed to load conflict details');
+            const data = await res.json();
+            conflictData = data.conflicts || [];
+
+            if (openPanel) {
+                renderConflictPanel(conflictData);
+            }
+        } catch (err) {
+            console.error('Error loading conflicts:', err);
+            if (openPanel) {
+                renderConflictPanel([]);
+                document.getElementById('conflict-summary').textContent = 'Could not load conflict details right now.';
+            }
+        }
+    }
 
     async function loadPerformance() {
         try {
@@ -260,7 +397,53 @@ Admin Dashboard
     }
 
     loadPerformance();
+    loadConflictDetails();
     setInterval(loadPerformance, 5000);
+    setInterval(loadConflictDetails, 15000);
+
+    const viewConflictsBtn = document.getElementById('view-conflicts-btn');
+    const closeConflictPanelBtn = document.getElementById('close-conflict-panel');
+    const autoFixConflictsBtn = document.getElementById('auto-fix-conflicts-btn');
+
+    if (viewConflictsBtn) {
+        viewConflictsBtn.addEventListener('click', async () => {
+            await loadConflictDetails(true);
+            document.getElementById('conflict-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    }
+
+    if (closeConflictPanelBtn) {
+        closeConflictPanelBtn.addEventListener('click', () => {
+            document.getElementById('conflict-panel')?.classList.add('hidden');
+        });
+    }
+
+    if (autoFixConflictsBtn) {
+        autoFixConflictsBtn.addEventListener('click', async () => {
+            if (!confirm('This will move conflicting timetable entries into available slots automatically. Continue?')) return;
+
+            autoFixConflictsBtn.disabled = true;
+            autoFixConflictsBtn.textContent = 'Fixing...';
+
+            try {
+                const response = await fetch('/analytics/auto-fix-conflicts', { method: 'POST' });
+                const result = await response.json();
+
+                if (!response.ok || result.status !== 'success') {
+                    throw new Error(result.message || 'Failed to auto-fix conflicts');
+                }
+
+                await loadPerformance();
+                await loadConflictDetails(true);
+                renderFixResult(result);
+            } catch (error) {
+                alert(error.message || 'Failed to auto-fix conflicts');
+            } finally {
+                autoFixConflictsBtn.disabled = false;
+                autoFixConflictsBtn.textContent = 'Auto-Fix Conflicts';
+            }
+        });
+    }
 
     const fakeDataBtn = document.getElementById('faker-dashboard-btn');
     const resetBtn = document.getElementById('reset-dashboard-btn');
