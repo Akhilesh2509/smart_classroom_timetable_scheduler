@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Timetable Management{% endblock %}
+{% block title %}{% if session.get('role') == 'student' %}My Timetable{% else %}Timetable Management{% endif %}{% endblock %}
 
 {% block header %}
-<h1 class="text-3xl font-bold text-gray-200">Timetable Management</h1>
-<p class="text-gray-400 mt-1">Manage and generate timetables for all classes, grades, and streams</p>
+<h1 class="text-3xl font-bold text-gray-200">{% if session.get('role') == 'student' %}My Timetable{% else %}Timetable Management{% endif %}</h1>
+<p class="text-gray-400 mt-1">{% if session.get('role') == 'student' %}View your class timetable for your assigned batch.{% else %}Manage and generate timetables for all classes, grades, and streams{% endif %}</p>
 <style>
 
 /* ===== FORCE WHITE UI ===== */
@@ -232,15 +232,18 @@ tr:hover {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
             </svg>
             <h3 class="mt-2 text-sm font-medium text-gray-100">No timetable data</h3>
-            <p class="mt-1 text-sm text-gray-400">Generate a timetable to get started.</p>
+            <p class="mt-1 text-sm text-gray-400">{% if session.get('role') == 'student' %}No timetable has been published for your batch yet.{% else %}Generate a timetable to get started.{% endif %}</p>
+            {% if session.get('role') == 'admin' %}
             <div class="mt-6">
                 <button id="generate-empty-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                     Generate Timetable
                 </button>
             </div>
+            {% endif %}
         </div>
 
         <!-- Selection Controls -->
+        {% if session.get('role') == 'admin' %}
         <div class="glass-card p-6 mb-6">
             <h3 class="text-lg font-semibold text-gray-200 mb-4">Select Timetable View</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -269,6 +272,7 @@ tr:hover {
 </button>
             </div>
         </div>
+        {% endif %}
 
         <!-- Section Timetables Container -->
         <div id="timetables-container" class="space-y-8">
@@ -276,6 +280,7 @@ tr:hover {
         </div>
     </div>
 
+    {% if session.get('role') == 'admin' %}
     <!-- Statistics Panel -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div class="glass-card p-6">
@@ -334,8 +339,10 @@ tr:hover {
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
 
+{% if session.get('role') == 'admin' %}
 <!-- Generation Modal -->
 <div id="generation-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
     <div class="flex items-center justify-center min-h-screen p-4">
@@ -359,6 +366,7 @@ tr:hover {
         </div>
     </div>
 </div>
+{% endif %}
 
 <!-- Toast Notification -->
 <div id="toast" class="fixed top-5 right-5 z-50 hidden">
@@ -379,6 +387,7 @@ tr:hover {
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const APP_MODE = '{{ g.app_mode }}';
+    const IS_ADMIN = {{ 'true' if session.get('role') == 'admin' else 'false' }};
     const SETTINGS = JSON.parse(document.getElementById('timetable-settings').textContent);
     
     // Element references
@@ -413,16 +422,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (clearTimetableBtn) clearTimetableBtn.addEventListener('click', clearTimetable);
         
         // Filter controls - auto-apply on change
-        semesterSelect.addEventListener('change', () => {
-            updateDepartmentOptions();
-            applyFilter();
-        });
-        departmentSelect.addEventListener('change', () => {
-            updateSectionOptions();
-            applyFilter();
-        });
-        sectionSelect.addEventListener('change', applyFilter);
-        clearFilterBtn.addEventListener('click', clearFilter);
+        if (semesterSelect) {
+            semesterSelect.addEventListener('change', () => {
+                updateDepartmentOptions();
+                applyFilter();
+            });
+        }
+        if (departmentSelect) {
+            departmentSelect.addEventListener('change', () => {
+                updateSectionOptions();
+                applyFilter();
+            });
+        }
+        if (sectionSelect) sectionSelect.addEventListener('change', applyFilter);
+        if (clearFilterBtn) clearFilterBtn.addEventListener('click', clearFilter);
     }
     
     async function loadTimetableData() {
@@ -512,7 +525,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         // Populate filter dropdowns
-        populateFilterDropdowns();
+        if (IS_ADMIN) {
+            populateFilterDropdowns();
+        }
         
         // Clear container
         timetablesContainer.innerHTML = '';
@@ -753,10 +768,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function updateStatistics() {
-        document.getElementById('total-classes').textContent = timetableData.length;
-        document.getElementById('scheduled-classes').textContent = timetableData.length;
-        document.getElementById('conflicts').textContent = '0'; // Calculate conflicts
-        document.getElementById('efficiency').textContent = '95%'; // Calculate efficiency
+        const totalClasses = document.getElementById('total-classes');
+        const scheduledClasses = document.getElementById('scheduled-classes');
+        const conflicts = document.getElementById('conflicts');
+        const efficiency = document.getElementById('efficiency');
+
+        if (!totalClasses || !scheduledClasses || !conflicts || !efficiency) return;
+
+        totalClasses.textContent = timetableData.length;
+        scheduledClasses.textContent = timetableData.length;
+        conflicts.textContent = '0';
+        efficiency.textContent = '95%';
     }
     
     function showLoading() {
@@ -811,6 +833,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Filter functions
     function populateFilterDropdowns() {
+        if (!semesterSelect) return;
         if (!timetableData || timetableData.length === 0) return;
         
         // Get unique semesters
@@ -825,6 +848,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function updateDepartmentOptions() {
+        if (!semesterSelect || !departmentSelect || !sectionSelect) return;
         const selectedSemester = semesterSelect.value;
         departmentSelect.innerHTML = '<option value="">All Departments</option>';
         departmentSelect.disabled = !selectedSemester;
@@ -849,6 +873,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function updateSectionOptions() {
+        if (!semesterSelect || !departmentSelect || !sectionSelect) return;
         const selectedSemester = semesterSelect.value;
         const selectedDepartment = departmentSelect.value;
         sectionSelect.innerHTML = '<option value="">All Sections</option>';
@@ -875,6 +900,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function applyFilter() {
+        if (!semesterSelect || !departmentSelect || !sectionSelect) {
+            renderFilteredTimetable(sections);
+            return;
+        }
         const selectedSemester = semesterSelect.value;
         const selectedDepartment = departmentSelect.value;
         const selectedSection = sectionSelect.value;
@@ -906,6 +935,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function clearFilter() {
+        if (!semesterSelect || !departmentSelect || !sectionSelect) return;
         semesterSelect.value = '';
         departmentSelect.value = '';
         sectionSelect.value = '';

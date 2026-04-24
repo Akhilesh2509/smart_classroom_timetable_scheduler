@@ -1,8 +1,8 @@
-from flask import Blueprint, jsonify, request, session, redirect, url_for, render_template
+from flask import Blueprint, jsonify, request, session, redirect, url_for, render_template, g
 from sqlalchemy import exc
 
 from extensions import db
-from models import SchoolGroup, Semester, Subject, Course
+from models import SchoolGroup, Semester, Subject, Course, User, TimetableEntry
 from utils import log_activity, validate_json_request
 
 subjects_bp = Blueprint('subjects', __name__, url_prefix='/subjects')
@@ -11,6 +11,59 @@ subjects_bp = Blueprint('subjects', __name__, url_prefix='/subjects')
 def manage_subjects():
     if 'user_id' not in session:
         return redirect(url_for('main.login'))
+    if session.get('role') == 'student':
+        current_user = User.query.get(session['user_id'])
+        student = current_user.student if current_user else None
+        if not student:
+            return redirect(url_for('main.login'))
+
+        section = student.section
+        section_entries = TimetableEntry.query.options(
+            db.joinedload(TimetableEntry.subject),
+            db.joinedload(TimetableEntry.course)
+        ).filter_by(section_id=student.section_id).all() if section else []
+
+        subject_map = {}
+        if g.app_mode == 'school':
+            for entry in section_entries:
+                if entry.subject:
+                    subject_map[entry.subject.id] = {
+                        'name': entry.subject.name,
+                        'code': entry.subject.code,
+                        'meta': f"{entry.subject.weekly_hours or 0} hrs/week",
+                        'type': 'Core Subject'
+                    }
+
+            for elective in student.electives:
+                subject_map[elective.id] = {
+                    'name': elective.name,
+                    'code': elective.code,
+                    'meta': f"{elective.weekly_hours or 0} hrs/week",
+                    'type': 'Elective'
+                }
+        else:
+            department = section.department if section else None
+            if department:
+                for course in department.courses:
+                    subject_map[course.id] = {
+                        'name': course.name,
+                        'code': course.code,
+                        'meta': f"{course.credits or 0} credits",
+                        'type': (course.course_type or 'Course').title()
+                    }
+
+            for entry in section_entries:
+                if entry.course:
+                    subject_map[entry.course.id] = {
+                        'name': entry.course.name,
+                        'code': entry.course.code,
+                        'meta': f"{entry.course.credits or 0} credits",
+                        'type': (entry.course.course_type or 'Course').title()
+                    }
+
+        subjects = sorted(subject_map.values(), key=lambda item: (item['type'], item['name']))
+        return render_template('student_subjects.html', subjects=subjects, student=student)
+
     if session.get('role') != 'admin':
         return redirect(url_for('main.dashboard'))
     return render_template('subjects.html')

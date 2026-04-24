@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Exam Management{% endblock %}
+{% block title %}{% if session.get('role') == 'student' %}My Exams{% else %}Exam Management{% endif %}{% endblock %}
 
 {% block header %}
-<h1 class="text-3xl font-bold text-gray-200">Exam Management</h1>
-<p class="text-gray-400 mt-1">Schedule exams and manage seating arrangements</p>
+<h1 class="text-3xl font-bold text-gray-200">{% if session.get('role') == 'student' %}My Exams{% else %}Exam Management{% endif %}</h1>
+<p class="text-gray-400 mt-1">{% if session.get('role') == 'student' %}View your upcoming exams and schedule details.{% else %}Schedule exams and manage seating arrangements{% endif %}</p>
 <style>
 
 /* ===== CARD ===== */
@@ -144,6 +144,32 @@ tr:hover {
 .dark #exam-page .glass-card {
     background: #1e293b !important;
     border-color: #334155 !important;
+}
+
+.dark #exam-page #exams-container table {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+}
+
+.dark #exam-page #exams-container thead tr {
+    background: #334155 !important;
+    color: #f8fafc !important;
+}
+
+.dark #exam-page .exam-row td {
+    background: #1e293b !important;
+    color: #f1f5f9 !important;
+    border-color: #334155 !important;
+}
+
+.dark #exam-page .exam-row:hover {
+    background: #334155 !important;
+    color: #f8fafc !important;
+}
+
+.dark #exam-page .badge {
+    background: #ef4444 !important;
+    color: #fff !important;
 }
 
 .dark #exam-page .text-gray-100,
@@ -319,6 +345,7 @@ tr:hover {
 {% block content %}
 <div id="exam-page" class="space-y-6">
     <!-- Controls Panel -->
+    {% if session.get('role') == 'admin' %}
     <div class="glass-card p-6">
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-4">
@@ -356,6 +383,7 @@ tr:hover {
             </div>
         </div>
     </div>
+    {% endif %}
 
     <!-- Exams List -->
     <div class="glass-card p-6">
@@ -377,13 +405,15 @@ tr:hover {
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-100">No exams scheduled</h3>
-            <p class="mt-1 text-sm text-gray-400">Get started by adding your first exam.</p>
+            <h3 class="mt-2 text-sm font-medium text-gray-100">{% if session.get('role') == 'student' %}No upcoming exam{% else %}No exams scheduled{% endif %}</h3>
+            <p class="mt-1 text-sm text-gray-400">{% if session.get('role') == 'student' %}There are no exam schedules available for your login right now.{% else %}Get started by adding your first exam.{% endif %}</p>
+            {% if session.get('role') == 'admin' %}
             <div class="mt-6">
                 <button id="add-exam-empty-btn" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                     Add Exam
                 </button>
             </div>
+            {% endif %}
         </div>
 
         <!-- Exams Table -->
@@ -397,7 +427,9 @@ tr:hover {
                             <th class="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Date & Time</th>
                             <th class="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Duration</th>
                             <th class="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Type</th>
+                            {% if session.get('role') == 'admin' %}
                             <th class="text-left py-3 px-4 font-medium text-gray-700 dark:text-gray-300">Actions</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody id="exams-table-body">
@@ -573,6 +605,7 @@ tr:hover {
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     const APP_MODE = '{{ g.app_mode }}';
+    const IS_ADMIN = {{ 'true' if session.get('role') == 'admin' else 'false' }};
     
     // Element references
     const addExamBtn = document.getElementById('add-exam-btn');
@@ -599,25 +632,27 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Initialize
     loadExams();
-    loadSubjects();
+    if (IS_ADMIN) loadSubjects();
     setupEventListeners();
     
     function setupEventListeners() {
-        addExamBtn.addEventListener('click', () => openExamModal());
-        addExamEmptyBtn.addEventListener('click', () => openExamModal());
-        generateScheduleBtn.addEventListener('click', generateSchedule);
-        exportExamsBtn.addEventListener('click', exportExams);
-        examFilter.addEventListener('change', applyFilter);
-        closeModal.addEventListener('click', closeExamModal);
-        cancelExam.addEventListener('click', closeExamModal);
-        examForm.addEventListener('submit', handleExamSubmit);
+        if (addExamBtn) addExamBtn.addEventListener('click', () => openExamModal());
+        if (addExamEmptyBtn) addExamEmptyBtn.addEventListener('click', () => openExamModal());
+        if (generateScheduleBtn) generateScheduleBtn.addEventListener('click', generateSchedule);
+        if (exportExamsBtn) exportExamsBtn.addEventListener('click', exportExams);
+        if (examFilter) examFilter.addEventListener('change', applyFilter);
+        if (closeModal) closeModal.addEventListener('click', closeExamModal);
+        if (cancelExam) cancelExam.addEventListener('click', closeExamModal);
+        if (examForm) examForm.addEventListener('submit', handleExamSubmit);
         
         // Close modal on outside click
-        examModal.addEventListener('click', (e) => {
-            if (e.target === examModal) {
-                closeExamModal();
-            }
-        });
+        if (examModal) {
+            examModal.addEventListener('click', (e) => {
+                if (e.target === examModal) {
+                    closeExamModal();
+                }
+            });
+        }
     }
     
     async function loadExams() {
@@ -649,6 +684,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     async function loadSubjects() {
+        if (!IS_ADMIN) return;
         try {
             const response = await fetch(`/api/subjects/parents/${APP_MODE}`);
             if (response.ok) {
@@ -679,6 +715,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function openExamModal(exam = null) {
+        if (!IS_ADMIN) return;
         isEditMode = exam !== null;
         currentExamId = exam ? exam.id : null;
         
@@ -708,6 +745,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     async function handleExamSubmit(e) {
         e.preventDefault();
+        if (!IS_ADMIN) return;
         
         const formData = new FormData(examForm);
         const examData = {
@@ -748,6 +786,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     async function generateSchedule() {
+        if (!IS_ADMIN) return;
         if (exams.length === 0) {
             showToast('No exams to schedule', 'error');
             return;
@@ -783,6 +822,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function exportExams() {
+        if (!IS_ADMIN) return;
         showToast('Exporting exam schedule...', 'info');
         window.location.href = '/exams/api/export';
     }
@@ -810,7 +850,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function applyFilter() {
-        const filter = examFilter.value;
+        const filter = examFilter ? examFilter.value : 'all';
         const now = new Date();
         
         filteredExams = exams.filter(exam => {
@@ -849,7 +889,27 @@ document.addEventListener('DOMContentLoaded', () => {
             row.className = 'exam-row border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700';
             
             const examDate = new Date(exam.date);
-            const isUpcoming = examDate > new Date();
+            const actionsCell = IS_ADMIN ? `
+                <td class="py-3 px-4">
+                    <div class="flex items-center space-x-2">
+                        <button onclick="editExam(${exam.id})" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                            </svg>
+                        </button>
+                        <button onclick="viewSeating(${exam.id})" class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                            </svg>
+                        </button>
+                        <button onclick="deleteExam(${exam.id})" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </td>
+            ` : '';
             
             row.innerHTML = `
                 <td class="py-3 px-4">
@@ -871,25 +931,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ${exam.type.charAt(0).toUpperCase() + exam.type.slice(1)}
                     </span>
                 </td>
-                <td class="py-3 px-4">
-                    <div class="flex items-center space-x-2">
-                        <button onclick="editExam(${exam.id})" class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                            </svg>
-                        </button>
-                        <button onclick="viewSeating(${exam.id})" class="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-300">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                            </svg>
-                        </button>
-                        <button onclick="deleteExam(${exam.id})" class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
-                        </button>
-                    </div>
-                </td>
+                ${actionsCell}
             `;
             
             examsTableBody.appendChild(row);
@@ -920,7 +962,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('total-exams').textContent = exams.length;
         document.getElementById('upcoming-exams').textContent = upcoming;
         document.getElementById('this-week-exams').textContent = thisWeek;
-        document.getElementById('total-students').textContent = '0'; // Would need to fetch from API
+        document.getElementById('total-students').textContent = IS_ADMIN ? '0' : '1';
     }
     
     function showLoading() {
@@ -974,6 +1016,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Global functions for inline event handlers
     window.editExam = function(examId) {
+        if (!IS_ADMIN) return;
         const exam = exams.find(e => e.id === examId);
         if (exam) {
             openExamModal(exam);
@@ -981,11 +1024,13 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     window.viewSeating = function(examId) {
+        if (!IS_ADMIN) return;
         // Implement seating plan view
         showToast('Seating plan view coming soon!', 'info');
     };
     
     window.deleteExam = async function(examId) {
+        if (!IS_ADMIN) return;
         if (confirm('Are you sure you want to delete this exam?')) {
             try {
                 const response = await fetch(`/exams/api/exams/${examId}`, {

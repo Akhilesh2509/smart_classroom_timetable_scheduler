@@ -12,12 +12,63 @@ from utils import log_activity, validate_json_request
 
 exams_bp = Blueprint('exams', __name__, url_prefix='/exams')
 
+
+def get_exam_section_label(exam_name):
+    exam_name = (exam_name or '').strip()
+    if not exam_name:
+        return None
+
+    lowered_name = exam_name.lower()
+    section_names = [
+        name for (name,) in db.session.query(StudentSection.name)
+        .filter(StudentSection.name.isnot(None))
+        .all()
+    ]
+
+    # Extract the section part from the exam name (before the first ' - ')
+    section_part = exam_name.split(' - ')[0].strip().lower()
+    for section_name in sorted(section_names, key=len, reverse=True):
+        lowered_section = section_name.lower().strip()
+        if section_part == lowered_section:
+            return lowered_section
+
+    return None
+
+
+def get_student_visible_exams(student):
+    """Return exams relevant to the logged-in student."""
+    if not student:
+        return []
+
+    section = student.section
+    department_id = section.department_id if section else None
+    grade_name = section.grade.name.lower() if section and section.grade else None
+    section_name = section.name.lower() if section else None
+
+    seating_exam_ids = [
+        exam_id for (exam_id,) in db.session.query(ExamSeating.exam_id)
+        .filter_by(student_id=student.id)
+        .distinct()
+        .all()
+    ]
+    if seating_exam_ids:
+        return Exam.query.options(
+            joinedload(Exam.subject),
+            joinedload(Exam.course)
+        ).filter(Exam.id.in_(seating_exam_ids)).order_by(Exam.date.asc()).all()
+
+    visible = []
+    for exam in Exam.query.options(joinedload(Exam.subject), joinedload(Exam.course)).order_by(Exam.date.asc()).all():
+        if section_name and get_exam_section_label(exam.name) == section_name:
+            visible.append(exam)
+    return visible
+
 @exams_bp.route('/')
 def manage_exams():
     """Render the exam management page."""
     if 'user_id' not in session:
         return redirect(url_for('main.login'))
-    if session.get('role') != 'admin':
+    if session.get('role') not in ['admin', 'student']:
         return redirect(url_for('main.dashboard'))
     return render_template('exams.html')
 
@@ -30,10 +81,16 @@ def handle_exams(exam_id=None):
     
     try:
         if request.method == 'GET':
-            exams = Exam.query.options(
-                joinedload(Exam.subject),
-                joinedload(Exam.course)
-            ).all()
+            if session.get('role') == 'student':
+                student = Student.query.options(joinedload(Student.section).joinedload(StudentSection.grade)).filter_by(
+                    user_id=session['user_id']
+                ).first()
+                exams = get_student_visible_exams(student)
+            else:
+                exams = Exam.query.options(
+                    joinedload(Exam.subject),
+                    joinedload(Exam.course)
+                ).all()
             
             exams_data = []
             for exam in exams:
@@ -49,6 +106,9 @@ def handle_exams(exam_id=None):
                 exams_data.append(exam_data)
             
             return jsonify({"exams": exams_data})
+
+        if session.get('role') != 'admin':
+            return jsonify({"message": "Access denied"}), 403
         
         if request.method in ['POST', 'PUT']:
             data, error_response, status_code = validate_json_request()
@@ -115,6 +175,8 @@ def generate_exam_schedule():
     """Generate exam schedule and seating plan using Gemini AI."""
     if 'user_id' not in session:
         return jsonify({"message": "Unauthorized"}), 401
+    if session.get('role') != 'admin':
+        return jsonify({"message": "Access denied"}), 403
     
     try:
         data, error_response, status_code = validate_json_request()
@@ -500,6 +562,8 @@ def export_exam_schedule(exam_id):
     """Export exam schedule and seating plan as PDF."""
     if 'user_id' not in session:
         return redirect(url_for('main.login'))
+    if session.get('role') != 'admin':
+        return jsonify({"message": "Access denied"}), 403
     
     # This would integrate with a PDF generation library like ReportLab
     # For now, return a placeholder response
@@ -510,6 +574,8 @@ def export_all_exams():
     """Export all exams and seating summaries as a PDF."""
     if 'user_id' not in session:
         return redirect(url_for('main.login'))
+    if session.get('role') != 'admin':
+        return jsonify({"message": "Access denied"}), 403
 
     try:
         exams = Exam.query.options(

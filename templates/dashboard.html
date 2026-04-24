@@ -122,12 +122,41 @@ Admin Dashboard
         border: 1px dashed #cbd5e1;
         background: #f8fafc;
     }
+
+    .student-detail-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+    }
+
+    .dark .student-detail-card {
+        background: #0f172a !important;
+        border-color: #334155 !important;
+    }
+
+    .dark .student-detail-card p,
+    .dark .student-detail-card h4,
+    .dark .student-detail-card span {
+        color: #e2e8f0 !important;
+    }
 </style>
 
 <div class="space-y-8">
 
     <!-- Stats -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {% if session.get('role') == 'student' %}
+        {% for title, value in [
+        ('My Batch', student_context.section_name or 'Not Assigned'),
+        ('Department', student_context.department_name or 'Not Assigned'),
+        ('Classes Scheduled', stats['classes_scheduled']),
+        ('Upcoming Exams', stats['upcoming_exams'])
+        ] %}
+        <div class="glass-card p-6 rounded-2xl">
+            <p class="text-sm text-gray-500">{{ title }}</p>
+            <p class="text-3xl font-bold text-gray-800">{{ value }}</p>
+        </div>
+        {% endfor %}
+        {% else %}
         {% for title, key in [
         ('Total Students', 'total_students'),
         ('Active Teachers', 'teachers'),
@@ -139,7 +168,51 @@ Admin Dashboard
             <p class="text-3xl font-bold text-gray-800">{{ stats[key] }}</p>
         </div>
         {% endfor %}
+        {% endif %}
     </div>
+
+    {% if session.get('role') == 'student' %}
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div class="glass-card p-6 rounded-2xl xl:col-span-2">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">My Overview</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="student-detail-card rounded-xl p-4">
+                    <p class="text-sm text-gray-500">Student</p>
+                    <p class="text-lg font-semibold text-gray-800 mt-1">{{ student_context.full_name }}</p>
+                </div>
+                <div class="student-detail-card rounded-xl p-4">
+                    <p class="text-sm text-gray-500">Subjects Active</p>
+                    <p class="text-lg font-semibold text-gray-800 mt-1">{{ stats['subjects'] }}</p>
+                </div>
+                <div class="student-detail-card rounded-xl p-4 md:col-span-2">
+                    <p class="text-sm text-gray-500">Next Exam</p>
+                    {% if student_context.next_exam %}
+                    <p class="text-lg font-semibold text-gray-800 mt-1">{{ student_context.next_exam.name }}</p>
+                    <p class="text-sm text-gray-500 mt-1">{{ student_context.next_exam.date.strftime('%d %b %Y, %I:%M %p') }}</p>
+                    {% else %}
+                    <p class="text-lg font-semibold text-gray-800 mt-1">No upcoming exam</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Upcoming Exams</h3>
+            <div class="space-y-3">
+                {% for exam in student_context.upcoming_exams %}
+                <div class="student-detail-card rounded-xl p-4">
+                    <p class="font-semibold text-gray-800">{{ exam.name }}</p>
+                    <p class="text-sm text-gray-500 mt-1">{{ exam.date.strftime('%d %b %Y, %I:%M %p') }}</p>
+                </div>
+                {% else %}
+                <div class="student-detail-card rounded-xl p-4 text-sm text-gray-500">
+                    No upcoming exam
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Quick Actions -->
     {% if session.get('role') == 'admin' %}
@@ -203,6 +276,7 @@ Admin Dashboard
     </div>
     {% endif %}
 
+    {% if session.get('role') == 'admin' %}
     <!-- System -->
     <div class="glass-card p-6 rounded-2xl">
         <h3 class="text-xl font-semibold text-gray-800 mb-4">System Performance Overview</h3>
@@ -265,10 +339,12 @@ Admin Dashboard
         <h3 class="text-xl font-semibold text-gray-800 mb-4">System Analytics</h3>
         <canvas id="performanceChart"></canvas>
     </div>
+    {% endif %}
 
 </div>
 
 <script>
+    {% if session.get('role') == 'admin' %}
     let chart;
     let conflictData = [];
 
@@ -526,5 +602,6 @@ Admin Dashboard
             }
         });
     }
+    {% endif %}
 </script>
 {% endblock %}

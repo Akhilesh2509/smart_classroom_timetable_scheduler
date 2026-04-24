@@ -3,13 +3,80 @@ from datetime import datetime, timezone
 from flask import Blueprint, render_template, request, redirect, url_for, session, g, flash, jsonify, current_app, Response, stream_with_context
 from sqlalchemy import exc
 
-from models import AppConfig, User, SchoolGroup, Grade, Stream, Subject, Semester, Department, Course, SystemMetric, ActivityLog, TimetableEntry
+from models import AppConfig, User, SchoolGroup, Grade, Stream, Subject, Semester, Department, Course, SystemMetric, ActivityLog, TimetableEntry, Exam, StudentSection
 from extensions import db
 from utils import hash_password, log_activity, calculate_growth, set_config
 from werkzeug.security import check_password_hash
 from init_db_realistic import create_realistic_data, clear_database
 from faker import Faker
 fake = Faker()
+
+
+def get_exam_section_label(exam_name):
+    exam_name = (exam_name or '').strip()
+    if not exam_name:
+        return None
+
+    lowered_name = exam_name.lower()
+    section_names = [
+        name for (name,) in db.session.query(StudentSection.name)
+        .filter(StudentSection.name.isnot(None))
+        .all()
+    ]
+
+    for section_name in sorted(section_names, key=len, reverse=True):
+        lowered_section = section_name.lower()
+        if lowered_name == lowered_section or lowered_name.startswith(f"{lowered_section} - "):
+            return lowered_section
+
+    return None
+
+
+def get_student_visible_exams(student):
+    if not student or not student.section:
+        return []
+
+    section_name = (student.section.name or '').lower()
+    grade_name = (student.section.grade.name or '').lower() if student.section.grade else ''
+    department_id = student.section.department_id
+
+    exams = Exam.query.options(
+        db.joinedload(Exam.subject),
+        db.joinedload(Exam.course),
+        db.joinedload(Exam.seating_plans)
+    ).order_by(Exam.date.asc()).all()
+
+    seating_matches = [
+        exam for exam in exams
+        if any(seating.student_id == student.id for seating in exam.seating_plans)
+    ]
+    if seating_matches:
+        return seating_matches
+
+    section_named_matches = [
+        exam for exam in exams
+        if section_name and get_exam_section_label(exam.name) == section_name
+    ]
+    if section_named_matches:
+        return section_named_matches
+
+    if department_id:
+        department_matches = [
+            exam for exam in exams
+            if exam.course and exam.course.department_id == department_id
+        ]
+        if department_matches:
+            return department_matches
+
+    if grade_name:
+        grade_matches = [
+            exam for exam in exams
+            if grade_name in (exam.name or '').lower()
+        ]
+        if grade_matches:
+            return grade_matches
+
+    return []
 
 main_bp = Blueprint('main', __name__)
 
@@ -299,16 +366,22 @@ def student_dashboard():
         flash('Student profile not found.', 'error')
         return redirect(url_for('main.login'))
     
-    # Get student-specific statistics (use standard keys for template compatibility)
+    student_exams = get_student_visible_exams(student)
+    upcoming_exams = [exam for exam in student_exams if exam.date >= datetime.now()]
+    next_exam = upcoming_exams[0] if upcoming_exams else None
+    section_entries = TimetableEntry.query.filter_by(section_id=student.section_id).all() if student.section else []
+
+    # Get student-specific statistics
     stats = {
-        'total_students': User.query.filter_by(role='student').count(),
+        'total_students': len(student.section.students) if student.section else 0,
         'teachers': User.query.filter_by(role='teacher').count(),
-        'classes_scheduled': TimetableEntry.query.filter_by(section_id=student.section_id).count() if student.section else 0,
+        'classes_scheduled': len(section_entries),
+        'upcoming_exams': len(upcoming_exams),
     }
     if g.app_mode == 'school':
-        stats['subjects'] = Subject.query.count()
+        stats['subjects'] = len({entry.subject_id for entry in section_entries if entry.subject_id})
     else:
-        stats['subjects'] = Course.query.count()
+        stats['subjects'] = len({entry.course_id for entry in section_entries if entry.course_id})
     
     # Add growth percentages
     stats['total_students_growth'] = 0
@@ -316,16 +389,15 @@ def student_dashboard():
     stats['classes_scheduled_growth'] = 0
     stats['subjects_growth'] = 0
     
-    recent_activities = ActivityLog.query.order_by(ActivityLog.timestamp.desc()).limit(5).all()
-    performance = {
-        'accuracy': AppConfig.query.filter_by(key='last_schedule_accuracy').first(),
-        'gen_time': AppConfig.query.filter_by(key='last_generation_time').first(),
+    student_context = {
+        'full_name': student.full_name,
+        'section_name': student.section.name if student.section else 'Not assigned',
+        'department_name': student.section.department.name if student.section and student.section.department else '',
+        'next_exam': next_exam,
+        'upcoming_exams': upcoming_exams[:5]
     }
-    performance['accuracy'] = float(performance['accuracy'].value) if performance['accuracy'] else 0
-    performance['gen_time'] = float(performance['gen_time'].value) if performance['gen_time'] else 0
-    performance['uptime'] = 99.9
 
-    return render_template('dashboard.html', stats=stats, activities=recent_activities, performance=performance)
+    return render_template('dashboard.html', stats=stats, student_context=student_context)
 
 @main_bp.route('/dashboard')
 def dashboard():

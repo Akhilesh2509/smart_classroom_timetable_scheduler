@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}My Subjects{% endblock %}
+
+{% block header %}
+<div class="flex-grow">
+    <h2 class="text-2xl font-bold text-gray-800">My Subjects</h2>
+    <p class="text-sm text-gray-500">View the subjects and courses assigned to your batch.</p>
+</div>
+{% endblock %}
+
+{% block content %}
+<style>
+    #student-subjects-page .subject-card {
+        background: #ffffff;
+        border: 1px solid #dbe4f0;
+        border-radius: 18px;
+    }
+
+    #student-subjects-page .subject-code {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 9999px;
+        background: #eef4ff;
+        color: #3d52a0;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 0.35rem 0.75rem;
+    }
+
+    .dark #student-subjects-page .subject-card {
+        background: #1e293b !important;
+        border-color: #334155 !important;
+    }
+
+    .dark #student-subjects-page .subject-code {
+        background: rgba(59, 130, 246, 0.16) !important;
+        color: #bfdbfe !important;
+    }
+
+    .dark #student-subjects-page .empty-card {
+        background: #1e293b !important;
+        border-color: #334155 !important;
+        color: #cbd5e1 !important;
+    }
+</style>
+
+<div id="student-subjects-page" class="space-y-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="glass-card p-6 rounded-2xl">
+            <p class="text-sm text-gray-500">Student</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">{{ student.full_name }}</p>
+        </div>
+        <div class="glass-card p-6 rounded-2xl">
+            <p class="text-sm text-gray-500">Batch</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">{{ student.section.name if student.section else 'Not Assigned' }}</p>
+        </div>
+        <div class="glass-card p-6 rounded-2xl">
+            <p class="text-sm text-gray-500">Total Subjects</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">{{ subjects|length }}</p>
+        </div>
+    </div>
+
+    {% if subjects %}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {% for item in subjects %}
+        <div class="subject-card p-6 shadow-sm">
+            <div class="flex items-start justify-between gap-4">
+                <div>
+                    <h3 class="text-xl font-semibold text-gray-800">{{ item.name }}</h3>
+                    <p class="text-sm text-gray-500 mt-2">{{ item.meta }}</p>
+                </div>
+                <span class="subject-code">{{ item.code }}</span>
+            </div>
+            <div class="mt-4">
+                <span class="inline-flex items-center rounded-full border border-gray-200 px-3 py-1 text-xs font-semibold text-gray-600 dark:border-slate-600 dark:text-slate-300">
+                    {{ item.type }}
+                </span>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-card glass-card p-10 rounded-2xl text-center">
+        <h3 class="text-xl font-semibold text-gray-800">No subjects available</h3>
+        <p class="text-sm text-gray-500 mt-2">Your assigned subjects will appear here once your batch data is ready.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -5,7 +5,7 @@ import os
 import requests
 from flask import Blueprint, request, redirect, url_for, session, g, jsonify, render_template, make_response
 from sqlalchemy.orm import joinedload
-from models import db, Teacher, Student, StudentSection, Classroom, Subject, Course, AppConfig, TimetableEntry, SchoolGroup, Grade, Stream, Semester, Department
+from models import db, Teacher, User, Student, StudentSection, Classroom, Subject, Course, AppConfig, TimetableEntry, SchoolGroup, Grade, Stream, Semester, Department
 from utils import set_config, log_activity, validate_json_request
 
 timetable_bp = Blueprint('timetable', __name__)
@@ -40,7 +40,12 @@ def view_timetable():
         'working_days': working_days,
         'breaks': json.loads(AppConfig.query.filter_by(key='breaks').first().value),
     }
-    return render_template('timetable.html', settings=settings)
+    student_section_id = None
+    if session.get('role') == 'student':
+        current_user = User.query.get(session['user_id'])
+        student_section_id = current_user.student.section_id if current_user and current_user.student else None
+
+    return render_template('timetable.html', settings=settings, student_section_id=student_section_id)
 
 @timetable_bp.route('/api/timetable_data')
 def get_timetable_data():
@@ -50,13 +55,22 @@ def get_timetable_data():
 
     try:
         # Get all timetable entries with related data
-        entries = TimetableEntry.query.options(
+        entries_query = TimetableEntry.query.options(
             joinedload(TimetableEntry.teacher),
             joinedload(TimetableEntry.section),
             joinedload(TimetableEntry.classroom),
             joinedload(TimetableEntry.subject),
             joinedload(TimetableEntry.course)
-        ).all()
+        )
+
+        if session.get('role') == 'student':
+            current_user = User.query.get(session['user_id'])
+            student = current_user.student if current_user else None
+            if not student or not student.section_id:
+                return jsonify([])
+            entries_query = entries_query.filter(TimetableEntry.section_id == student.section_id)
+
+        entries = entries_query.all()
         
         # Convert to dictionary format for frontend
         timetable_data = []
@@ -97,6 +111,9 @@ def get_timetable_data():
 @timetable_bp.route('/api/generate_timetable', methods=['POST'])
 def generate_timetable():
     """Generate timetable using the advanced algorithm."""
+    if session.get('role') != 'admin':
+        return jsonify({'error': 'Access denied'}), 403
+
     print("🔍 DEBUG: generate_timetable called")
 
     if 'user_id' not in session:
@@ -354,6 +371,8 @@ def clear_timetable():
     """Clear all timetable entries."""
     if 'user_id' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
+    if session.get('role') != 'admin':
+        return jsonify({'error': 'Access denied'}), 403
 
     try:
         TimetableEntry.query.delete()
@@ -377,14 +396,36 @@ def export_timetable():
         department_filter = request.args.get('department', type=str)
         section_filter = request.args.get('section', type=str)
 
-        entries = TimetableEntry.query.options(
+        entries_query = TimetableEntry.query.options(
             joinedload(TimetableEntry.teacher),
             joinedload(TimetableEntry.section).joinedload(StudentSection.department).joinedload(Department.semester),
             joinedload(TimetableEntry.section).joinedload(StudentSection.grade),
             joinedload(TimetableEntry.classroom),
             joinedload(TimetableEntry.subject),
             joinedload(TimetableEntry.course)
-        ).order_by(TimetableEntry.section_id, TimetableEntry.period).all()
+        )
+
+        if session.get('role') == 'student':
+            current_user = User.query.get(session['user_id'])
+            student = current_user.student if current_user else None
+            if not student or not student.section_id:
+                return jsonify({'error': 'No timetable available for this student'}), 404
+
+            entries_query = entries_query.filter(TimetableEntry.section_id == student.section_id)
+
+            if not section_filter and student.section:
+                section_filter = student.section.name
+
+            if not semester_filter:
+                if student.section and student.section.department and student.section.department.semester:
+                    semester_filter = student.section.department.semester.name
+                elif student.section and student.section.grade:
+                    semester_filter = student.section.grade.name
+
+            if not department_filter and student.section and student.section.department:
+                department_filter = student.section.department.name
+
+        entries = entries_query.order_by(TimetableEntry.section_id, TimetableEntry.period).all()
 
         working_days_raw = AppConfig.query.filter_by(key='working_days').first()
         if working_days_raw:
