@@ -3,7 +3,7 @@ from sqlalchemy import exc
 
 from extensions import db
 from models import User, Teacher, Subject, Course
-from utils import hash_password, log_activity, validate_json_request
+from utils import generate_random_password, hash_password, log_activity, validate_json_request
 
 staff_bp = Blueprint('staff', __name__, url_prefix='/staff')
 
@@ -69,11 +69,11 @@ def handle_staff(teacher_id=None):
             return error_response, status_code
         
         if request.method == 'POST':
-            if not data.get('password'): return jsonify({"message": "Password is required for new teachers."}), 400
             if User.query.filter_by(username=data['username']).first(): return jsonify({"message": "Username already exists."}), 409
             if User.query.filter_by(email=data['email']).first(): return jsonify({"message": "Email already exists."}), 409
 
-            new_user = User(username=data['username'], email=data['email'], password=hash_password(data['password']), role='teacher')
+            generated_password = generate_random_password()
+            new_user = User(username=data['username'], email=data['email'], password=hash_password(generated_password), role='teacher')
             db.session.add(new_user)
             db.session.flush()
 
@@ -99,7 +99,6 @@ def handle_staff(teacher_id=None):
             
             user.username = data['username']
             user.email = data['email']
-            if data.get('password'): user.password = hash_password(data['password'])
             
             teacher.full_name = data['full_name']
             teacher.max_weekly_hours = data['max_weekly_hours']

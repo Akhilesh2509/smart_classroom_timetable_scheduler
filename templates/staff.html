@@ -58,25 +58,27 @@ transition-all duration-200">
 
 
 <!-- ====== MODALS & TEMPLATES ====== -->
-<div id="form-modal" class="hidden fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-    <div class="glass-card rounded-lg w-full max-w-3xl transform transition-all opacity-0 -translate-y-10">
-        <form class="p-6" onsubmit="return false;">
+<div id="form-modal" class="hidden fixed inset-0 bg-slate-950/55 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="modal-panel glass-card rounded-2xl w-full max-w-4xl transform transition-all opacity-0 -translate-y-10 shadow-2xl">
+        <form class="p-6 md:p-8" onsubmit="return false;">
             <h2 class="text-2xl font-bold text-white mb-6 form-title">Add New Teacher</h2>
             <input type="hidden" name="id">
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+            <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] gap-6 items-start">
                 <!-- Left Column: Details -->
                 <div class="space-y-4">
                     <div><label class="block text-sm font-medium text-gray-300 mb-1">Full Name</label><input type="text" name="full_name" class="input-base" required></div>
                     <div><label class="block text-sm font-medium text-gray-300 mb-1">Email</label><input type="email" name="email" class="input-base" required></div>
                     <div><label class="block text-sm font-medium text-gray-300 mb-1">Username</label><input type="text" name="username" class="input-base" required></div>
-                    <div><label class="block text-sm font-medium text-gray-300 mb-1">Password</label><input type="password" name="password" class="input-base" placeholder="Leave blank to keep unchanged"></div>
                     <div><label class="block text-sm font-medium text-gray-300 mb-1">Max Weekly Hours</label><input type="number" name="max_weekly_hours" class="input-base" required></div>
                 </div>
 
                 <!-- Right Column: Subjects -->
-                <div class="space-y-2 flex flex-col mt-4 md:mt-0">
-                     <label class="block text-sm font-medium text-gray-300 mb-1">Teachable Subjects</label>
+                <div class="space-y-3 flex flex-col">
+                     <div>
+                        <label class="block text-sm font-medium text-gray-300 mb-1">Teachable Subjects</label>
+                        <p class="text-sm teacher-picker-help">Search and pick one or more subjects for this teacher.</p>
+                     </div>
                      <div class="relative">
                          <input type="text" id="subject-search" class="input-base w-full pr-10" placeholder="Search subjects..." autocomplete="off">
                          <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
@@ -84,19 +86,19 @@ transition-all duration-200">
                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                              </svg>
                          </div>
-                         <div id="subjects-dropdown" class="hidden absolute z-10 w-full mt-1 bg-gray-800 border border-gray-700 rounded-md shadow-lg max-h-60 overflow-y-auto">
+                         <div id="subjects-dropdown" class="hidden absolute z-10 w-full mt-2 rounded-xl shadow-xl max-h-60 overflow-y-auto">
                              <!-- Options will be dynamically inserted here -->
                          </div>
                      </div>
-                     <div id="selected-subjects" class="flex flex-wrap gap-2 min-h-[40px] p-2 bg-gray-900/50 rounded-md border border-gray-700">
+                     <div id="selected-subjects" class="flex flex-wrap gap-2 min-h-[52px] p-3 rounded-xl border">
                          <!-- Selected subjects will be displayed here -->
                      </div>
                 </div>
             </div>
 
-            <div class="flex justify-end gap-x-3 pt-6 mt-6 border-t border-gray-700">
-                <button type="button" class="cancel-btn btn-secondary">Cancel</button>
-                <button type="submit" class="save-btn btn-primary">Save Changes</button>
+            <div class="modal-actions flex justify-end gap-x-3 pt-6 mt-6 border-t border-gray-700">
+                <button type="button" class="cancel-btn btn-secondary action-btn">Cancel</button>
+                <button type="submit" class="save-btn btn-primary action-btn">Save Changes</button>
             </div>
         </form>
     </div>
@@ -205,6 +207,89 @@ transition-all duration-200">
         color: #dc2626 !important;
     }
 
+    #form-modal .modal-panel {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%) !important;
+        border-color: #c8d2ea !important;
+        max-height: min(90vh, 820px);
+        overflow: hidden;
+    }
+
+    #form-modal form {
+        max-height: min(90vh, 820px);
+        overflow-y: auto;
+    }
+
+    #form-modal .text-white {
+        color: #111827 !important;
+    }
+
+    #form-modal .text-gray-300 {
+        color: #475569 !important;
+    }
+
+    #form-modal .teacher-picker-help {
+        color: #64748b !important;
+    }
+
+    #form-modal .modal-actions {
+        position: sticky;
+        bottom: 0;
+        background: linear-gradient(180deg, rgba(248, 251, 255, 0) 0%, #f8fbff 22%, #f8fbff 100%);
+        z-index: 2;
+    }
+
+    #form-modal .action-btn {
+        min-width: 132px;
+        min-height: 46px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.2rem;
+        white-space: nowrap;
+        font-weight: 600;
+    }
+
+    #form-modal #subjects-dropdown {
+        background: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+
+    #form-modal #subjects-dropdown .subject-option {
+        color: #0f172a !important;
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    #form-modal #subjects-dropdown .subject-option:last-child {
+        border-bottom: 0;
+    }
+
+    #form-modal #subjects-dropdown .subject-option:hover {
+        background: #eef4ff !important;
+    }
+
+    #form-modal #selected-subjects {
+        background: #ffffff !important;
+        border-color: #cbd5e1 !important;
+    }
+
+    #form-modal #selected-subjects .subject-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.45rem 0.75rem;
+        border-radius: 999px;
+        background: #dbeafe;
+        color: #1d4ed8;
+        font-size: 0.75rem;
+        font-weight: 700;
+    }
+
+    #form-modal #selected-subjects .empty-state {
+        color: #94a3b8 !important;
+        font-size: 0.9rem;
+    }
+
     .dark #staff-page {
         background: #1e293b !important;
         border-color: #334155 !important;
@@ -281,6 +366,10 @@ transition-all duration-200">
         border: 1px solid #334155 !important;
     }
 
+    .dark #form-modal .modal-panel {
+        background: linear-gradient(180deg, #1e293b 0%, #162033 100%) !important;
+    }
+
     .dark #form-modal .text-white,
     .dark #confirm-modal .text-white {
         color: #f8fafc !important;
@@ -294,6 +383,14 @@ transition-all duration-200">
         color: #94a3b8 !important;
     }
 
+    .dark #form-modal .teacher-picker-help {
+        color: #cbd5e1 !important;
+    }
+
+    .dark #form-modal .modal-actions {
+        background: linear-gradient(180deg, rgba(22, 32, 51, 0) 0%, #162033 22%, #162033 100%);
+    }
+
     .dark #selected-subjects,
     .dark #subjects-dropdown {
         background: #0f172a !important;
@@ -301,8 +398,18 @@ transition-all duration-200">
         color: #e5e7eb !important;
     }
 
+    .dark #form-modal #subjects-dropdown .subject-option {
+        color: #e2e8f0 !important;
+        border-bottom-color: #1e293b;
+    }
+
     .dark #subjects-dropdown .subject-option:hover {
         background: #22304a !important;
+    }
+
+    .dark #form-modal #selected-subjects .subject-chip {
+        background: rgba(59, 130, 246, 0.18);
+        color: #bfdbfe;
     }
 </style>
 
@@ -375,15 +482,14 @@ document.addEventListener('DOMContentLoaded', () => {
             dropdown.innerHTML = '<div class="px-3 py-2 text-sm text-gray-500">No subjects found</div>';
         } else {
             dropdown.innerHTML = availableSubjects.map(subject => `
-                <div class="px-3 py-2 hover:bg-gray-700 cursor-pointer text-sm subject-option" data-subject-id="${subject.id}">
+                <div class="cursor-pointer text-sm subject-option" data-subject-id="${subject.id}">
                     <span class="font-medium">${subject.name}</span>
-                    <span class="text-xs text-gray-500 ml-2">(${subject.code})</span>
+                    <span class="text-xs text-slate-500 ml-2">(${subject.code})</span>
                 </div>
             `).join('');
         }
         
-        // Show/hide dropdown based on search input focus and content
-        if (searchInput === document.activeElement && searchInput.value.length > 0) {
+        if (searchInput === document.activeElement) {
             dropdown.classList.remove('hidden');
         } else {
             dropdown.classList.add('hidden');
@@ -393,10 +499,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateSelectedSubjects() {
         const container = document.getElementById('selected-subjects');
         if (selectedSubjects.length === 0) {
-            container.innerHTML = '<span class="text-sm text-gray-500">No subjects selected</span>';
+            container.innerHTML = '<span class="empty-state">No subjects selected</span>';
         } else {
             container.innerHTML = selectedSubjects.map(subject => `
-                <span class="inline-flex items-center gap-1 px-2 py-1 bg-purple-600 text-white text-xs rounded-full">
+                <span class="subject-chip">
                     ${subject.name}
                     <button type="button" class="remove-subject ml-1 hover:text-red-300" data-subject-id="${subject.id}">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -461,7 +567,6 @@ document.addEventListener('DOMContentLoaded', () => {
         form.reset();
         
         form.querySelector('.form-title').textContent = isNew ? 'Add New Teacher' : `Editing: ${data.full_name}`;
-        form.querySelector('[name="password"]').setAttribute('required', isNew);
 
         // Populate form
         if (!isNew) {
@@ -511,8 +616,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     formModal.addEventListener('click', (e) => {
-        if (e.target.classList.contains('subject-option')) {
-            const subjectId = e.target.dataset.subjectId;
+        const subjectOption = e.target.closest('.subject-option');
+        if (subjectOption) {
+            const subjectId = subjectOption.dataset.subjectId;
             addSubject(subjectId);
         } else if (e.target.closest('.remove-subject')) {
             const button = e.target.closest('.remove-subject');
@@ -525,12 +631,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function saveForm(form, id) {
         const formData = new FormData(form);
         const payload = Object.fromEntries(formData.entries());
+        payload.max_weekly_hours = Number(payload.max_weekly_hours);
         payload.subject_ids = selectedSubjects.map(s => s.id); // Get selected subjects
-
-        if (!id && !payload.password) {
-            showToast('Password is required for new teachers.', 'error');
-            return;
-        }
 
         const result = await apiRequest(id ? `${API_BASE_URL}/${id}` : API_BASE_URL, id ? 'PUT' : 'POST', payload);
         if (result) {

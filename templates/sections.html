@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Manage {{ 'Sections' if g.app_mode == 'school' else 'Batches' }} & Students{% endblock %}
+{% block title %}{{ 'Sections' if g.app_mode == 'school' else 'Batches' }} & Students{% endblock %}
 
 {% block header %}
 <div class="flex-grow">
-    <h2 class="text-2xl font-bold text-white">Manage {{ 'Sections' if g.app_mode == 'school' else 'Batches' }} & Students</h2>
+    <h2 class="text-2xl font-bold text-white">{{ 'Sections' if g.app_mode == 'school' else 'Batches' }} & Students</h2>
     <p class="text-sm text-gray-400">Organize student groups and manage enrollments efficiently.</p>
 </div>
 {% endblock %}
@@ -34,7 +34,7 @@
             
             <!-- Add Button -->
             <div class="flex justify-end">
-                <button id="add-section-btn" @click="openSectionModal()" class="btn-primary px-6 py-3 text-sm font-semibold inline-flex items-center" :disabled="!filters.secondary">
+                <button id="add-section-btn" type="button" @click.prevent="openSectionModal()" class="btn-primary px-6 py-3 text-sm font-semibold inline-flex items-center" :disabled="!filters.secondary">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                     </svg>
@@ -89,18 +89,18 @@
                         <p class="text-sm text-gray-400 mt-1">Manage student enrollments and information</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <button id="add-student-btn" @click="openStudentModal()" class="btn-secondary px-4 py-2 text-sm font-medium inline-flex items-center">
+                        <button id="add-student-btn" type="button" @click.stop.prevent="openStudentModal()" class="btn-secondary px-4 py-2 text-sm font-medium inline-flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
                             </svg>
                             Add Student
                         </button>
-                        <button @click="openSectionModal(selectedSection)" class="p-2 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 rounded-lg transition-colors">
+                        <button type="button" @click.stop.prevent="openSectionModal(selectedSection)" class="p-2 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 rounded-lg transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                             </svg>
                         </button>
-                        <button @click="deleteSection(selectedSection)" class="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors">
+                        <button type="button" @click.stop.prevent="deleteSection(selectedSection)" class="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd" />
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
@@ -159,12 +159,12 @@
                                     </td>
                                     <td class="px-6 py-4 text-right">
                                         <div class="flex items-center justify-end gap-2">
-                                            <button @click="openStudentModal(student, selectedSection.id)" class="p-2 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 rounded-lg transition-colors">
+                                            <button type="button" @click.stop.prevent="openStudentModal(student)" class="p-2 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 rounded-lg transition-colors">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                                     <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                                                 </svg>
                                             </button>
-                                            <button @click="deleteStudent(student)" class="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors">
+                                            <button type="button" @click.stop.prevent="deleteStudent(student)" class="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                                     <path fill-rule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clip-rule="evenodd" />
                                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
@@ -253,7 +253,7 @@
                             <span v-else class="truncate max-w-xs">${ modals.upload.file.name }</span>
                         </label>
                         
-                        <button @click="uploadFile" class="btn-primary bg-green-600 hover:bg-green-700 w-full inline-flex items-center justify-center" :disabled="!modals.upload.file || isSaving">
+                        <button type="button" @click.prevent="uploadFile" class="btn-primary bg-green-600 hover:bg-green-700 w-full inline-flex items-center justify-center" :disabled="!modals.upload.file || isSaving">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clip-rule="evenodd" />
                             </svg>
@@ -317,7 +317,7 @@
                     </div>
                     <h3 class="text-lg font-semibold text-white">${ modals.section.isEdit ? 'Edit' : 'Add' } {{ 'Section' if g.app_mode == 'school' else 'Batch' }}</h3>
                 </div>
-                <button @click="closeSectionModal" class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
+                <button type="button" @click.prevent="closeSectionModal" class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
@@ -342,8 +342,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button @click="closeSectionModal" class="btn-secondary px-6 py-2">Cancel</button>
-                <button @click="saveSection" class="btn-primary px-6 py-2 inline-flex items-center" :disabled="isSaving">
+                <button type="button" @click.prevent="closeSectionModal" class="btn-secondary px-6 py-2">Cancel</button>
+                <button type="button" @click.prevent="saveSection" class="btn-primary px-6 py-2 inline-flex items-center" :disabled="isSaving">
                     <svg v-if="isSaving" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 animate-spin" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
                     </svg>
@@ -365,7 +365,7 @@
                     </div>
                     <h3 class="text-lg font-semibold text-white">${ modals.student.isEdit ? 'Edit' : 'Add' } Student</h3>
                 </div>
-                <button @click="closeStudentModal" class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
+                <button type="button" @click.prevent="closeStudentModal" class="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                     </svg>
@@ -394,10 +394,13 @@
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-sm font-medium text-gray-300 mb-2">
-                            Password ${ modals.student.isEdit ? '(Leave blank to keep unchanged)' : '(Leave blank to use username as password)' }
+                            Password
+                            <span v-if="modals.student.isEdit">(Leave blank to keep unchanged)</span>
+                            <span v-else>(Leave blank to use username as password)</span>
                         </label>
-                        <input type="password" v-model="modals.student.data.password" class="input-base w-full" placeholder="${ modals.student.isEdit ? 'Enter new password' : 'Enter password (or leave blank to use username)' }">
-                        <p class="text-xs text-gray-500 mt-1">${ modals.student.isEdit ? 'Leave blank to keep the current password' : 'If left blank, the username will be used as the password' }</p>
+                        <input type="password" v-model="modals.student.data.password" class="input-base w-full" :placeholder="modals.student.isEdit ? 'Enter new password' : 'Enter password (or leave blank to use username)'">
+                        <p v-if="modals.student.isEdit" class="text-xs text-gray-500 mt-1">Leave blank to keep the current password</p>
+                        <p v-else class="text-xs text-gray-500 mt-1">If left blank, the username will be used as the password</p>
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-sm font-medium text-gray-300 mb-2">Electives (Optional)</label>
@@ -415,8 +418,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button @click="closeStudentModal" class="btn-secondary px-6 py-2">Cancel</button>
-                <button @click="saveStudent" class="btn-primary px-6 py-2 inline-flex items-center" :disabled="isSaving">
+                <button type="button" @click.prevent="closeStudentModal" class="btn-secondary px-6 py-2">Cancel</button>
+                <button type="button" @click.prevent="saveStudent" class="btn-primary px-6 py-2 inline-flex items-center" :disabled="isSaving">
                     <svg v-if="isSaving" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 animate-spin" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
                     </svg>
@@ -552,18 +555,40 @@ header .text-gray-400 {
 }
 
 #app .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
     background: rgba(15, 23, 42, 0.42);
 }
 
 #app .modal-content {
+    width: 100%;
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
+    border-radius: 20px;
     background: #ffffff !important;
     border: 1px solid #d8def0 !important;
     color: #111827;
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.22);
 }
 
 #app .modal-header,
 #app .modal-footer {
-    border-color: #e1e7f5 !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #e1e7f5;
+}
+
+#app .modal-footer {
+    border-bottom: 0;
+    border-top: 1px solid #e1e7f5;
 }
 
 #app .modal-header h3 {
@@ -795,9 +820,13 @@ createApp({
                 const res = await fetch(`{{ url_for('sections.handle_sections') }}?parent_id=${filters.secondary}`);
                 const data = await res.json();
                 sections.value = data.sections;
-                if (data.sections.length > 0) {
-                    selectedSection.value = data.sections[0];
+                if (data.sections.length === 0) {
+                    selectedSection.value = null;
+                    return;
                 }
+
+                const currentSelectedId = selectedSection.value?.id;
+                selectedSection.value = data.sections.find(section => section.id === currentSelectedId) || data.sections[0];
             } catch (error) { console.error(error); }
         };
 
@@ -822,6 +851,9 @@ createApp({
                 const result = await res.json();
                 if (!res.ok) throw new Error(result.message);
                 await fetchSections();
+                if (modals.section.isEdit && modals.section.data.id) {
+                    selectedSection.value = sections.value.find(section => section.id === modals.section.data.id) || selectedSection.value;
+                }
                 closeSectionModal();
             } catch(e) { modals.section.error = e.message; } finally { isSaving.value = false; }
         };
@@ -885,13 +917,21 @@ createApp({
                 const result = await res.json();
                 if (!res.ok) throw new Error(result.message);
                 await fetchSections();
+                if (modals.student.data.section_id) {
+                    selectedSection.value = sections.value.find(section => section.id === Number(modals.student.data.section_id)) || selectedSection.value;
+                }
                 closeStudentModal();
             } catch(e) { modals.student.error = e.message; } finally { isSaving.value = false; }
         };
 
         const deleteStudent = async (student) => {
             if (!confirm(`Delete student '${student.full_name}'?`)) return;
-            await fetch(`/api/students/${student.id}`, { method: 'DELETE' });
+            const response = await fetch(`/api/students/${student.id}`, { method: 'DELETE' });
+            const result = await response.json();
+            if (!response.ok) {
+                alert(result.message || 'Failed to delete student');
+                return;
+            }
             await fetchSections();
         };
 

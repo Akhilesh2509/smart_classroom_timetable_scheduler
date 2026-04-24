@@ -15,6 +15,29 @@ from sqlalchemy import text
 
 fake = Faker()
 
+
+def get_or_create_student_section(base_name, department, grade, sections, capacity=30):
+    matching_sections = [
+        section for section in sections
+        if section.department_id == department.id and section.name.startswith(base_name)
+    ]
+
+    for section in matching_sections:
+        if len(section.students) < section.capacity:
+            return section
+
+    suffix = "" if not matching_sections else f" - {len(matching_sections) + 1}"
+    new_section = StudentSection(
+        name=f"{base_name}{suffix}",
+        capacity=capacity,
+        grade=grade,
+        department=department
+    )
+    db.session.add(new_section)
+    db.session.flush()
+    sections.append(new_section)
+    return new_section
+
 def clear_database():
     """Clear all existing data"""
     print("🧹 Clearing existing database...")
@@ -223,10 +246,11 @@ def create_realistic_data():
     
     # Create sections for each department
     sections = []
+    section_labels = ['Section A', 'Section B']
     for dept in departments:
-        for section_letter in ['A', 'B']:  # 2 sections per department
+        for section_name in section_labels:  # 2 sections per department
             section = StudentSection(
-                name=f"Section {section_letter}",
+                name=section_name,
                 capacity=30,
                 grade=grades[len(sections) % len(grades)],
                 department=dept
@@ -301,16 +325,20 @@ def create_realistic_data():
         db.session.commit()
         print("✅ Teacher-course assignments completed!")
     
-    # Create students
+    # Create students beyond the initial section capacity so overflow sections are generated.
     students = []
-    for i in range(600):  # 600 students
+    target_student_count = 720
+    for i in range(target_student_count):
         user = User(
             username=f"student{i+1:03d}",
             email=f"student{i+1:03d}@adypu.edu.in",
             password=student_password_hash,
             role="student"
         )
-        section = random.choice(sections)
+        department = random.choice(departments)
+        base_section_name = random.choice(section_labels)
+        grade = grades[i % len(grades)]
+        section = get_or_create_student_section(base_section_name, department, grade, sections)
         student = Student(
             user=user,
             full_name=fake.name(),
@@ -376,7 +404,7 @@ def create_realistic_data():
     print(f"   🏫 Classrooms: {len(classrooms)}")
     print(f"   👨‍🏫 Teachers: {len(teachers)}")
     print(f"   👨‍🎓 Students: {len(students)}")
-    print(f"   📊 Total capacity: {len(sections) * 30} students")
+    print(f"   📊 Total capacity: {sum(section.capacity for section in sections)} students")
     
     return {
         'semesters': semesters,
@@ -402,7 +430,7 @@ def main():
             print("\n📋 Login credentials:")
             print("   Admin: admin / admin123")
             print("   Teachers: teacher01-teacher80 / teacher123")
-            print("   Students: student001-student600 / student123")
+            print(f"   Students: student001-student{len(data['students']):03d} / student123")
             
         except Exception as e:
             print(f"❌ Error initializing database: {e}")

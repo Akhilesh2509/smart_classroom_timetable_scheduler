@@ -22,8 +22,6 @@ def index():
     role = session.get('role')
     if role == 'admin':
         return redirect(url_for('main.admin_dashboard'))
-    elif role == 'teacher':
-        return redirect(url_for('main.teacher_dashboard'))
     elif role == 'student':
         return redirect(url_for('main.student_dashboard'))
     else:
@@ -194,8 +192,6 @@ def login():
         role = session.get('role')
         if role == 'admin':
             return redirect(url_for('main.admin_dashboard'))
-        elif role == 'teacher':
-            return redirect(url_for('main.teacher_dashboard'))
         elif role == 'student':
             return redirect(url_for('main.student_dashboard'))
         else:
@@ -204,6 +200,10 @@ def login():
     if request.method == 'POST':
         user = User.query.filter_by(username=request.form['username']).first()
         if user and check_password_hash(user.password, request.form['password']):
+            if user.role == 'teacher':
+                flash('Teacher login has been disabled. Only admin and student accounts can sign in.', 'error')
+                return render_template('login.html')
+
             session['user_id'] = user.id
             session['username'] = user.username
             session['role'] = user.role
@@ -212,8 +212,6 @@ def login():
             # Redirect based on user role
             if user.role == 'admin':
                 return redirect(url_for('main.admin_dashboard'))
-            elif user.role == 'teacher':
-                return redirect(url_for('main.teacher_dashboard'))
             elif user.role == 'student':
                 return redirect(url_for('main.student_dashboard'))
             else:
@@ -286,42 +284,9 @@ def admin_dashboard():
 
 @main_bp.route('/teacher-dashboard')
 def teacher_dashboard():
-    """Teacher dashboard with teaching schedule and performance"""
-    if 'user_id' not in session or session.get('role') != 'teacher':
-        return redirect(url_for('main.login'))
-    
-    teacher = User.query.get(session['user_id']).teacher
-    if not teacher:
-        flash('Teacher profile not found.', 'error')
-        return redirect(url_for('main.login'))
-    
-    # Get teacher-specific statistics (use standard keys for template compatibility)
-    stats = {
-        'total_students': User.query.filter_by(role='student').count(),
-        'teachers': User.query.filter_by(role='teacher').count(),
-        'classes_scheduled': TimetableEntry.query.filter_by(teacher_id=teacher.id).count(),
-    }
-    if g.app_mode == 'school':
-        stats['subjects'] = len(teacher.subjects)
-    else:
-        stats['subjects'] = len(teacher.courses)
-    
-    # Add growth percentages
-    stats['total_students_growth'] = 0
-    stats['teachers_growth'] = 0
-    stats['classes_scheduled_growth'] = 0
-    stats['subjects_growth'] = 0
-    
-    recent_activities = ActivityLog.query.order_by(ActivityLog.timestamp.desc()).limit(5).all()
-    performance = {
-        'accuracy': AppConfig.query.filter_by(key='last_schedule_accuracy').first(),
-        'gen_time': AppConfig.query.filter_by(key='last_generation_time').first(),
-    }
-    performance['accuracy'] = float(performance['accuracy'].value) if performance['accuracy'] else 0
-    performance['gen_time'] = float(performance['gen_time'].value) if performance['gen_time'] else 0
-    performance['uptime'] = 99.9
-
-    return render_template('dashboard.html', stats=stats, activities=recent_activities, performance=performance)
+    flash('Teacher login has been disabled. Please use an admin or student account.', 'error')
+    session.clear()
+    return redirect(url_for('main.login'))
 
 @main_bp.route('/student-dashboard')
 def student_dashboard():
@@ -371,8 +336,6 @@ def dashboard():
     role = session.get('role')
     if role == 'admin':
         return redirect(url_for('main.admin_dashboard'))
-    elif role == 'teacher':
-        return redirect(url_for('main.teacher_dashboard'))
     elif role == 'student':
         return redirect(url_for('main.student_dashboard'))
     

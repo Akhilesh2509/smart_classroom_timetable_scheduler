@@ -10,21 +10,29 @@ from utils import hash_password, generate_random_password, log_activity
 
 sections_bp = Blueprint('sections', __name__)
 
+
+def get_section_query_filters(section_name, department_id=None, grade_id=None):
+    if g.app_mode == 'school':
+        return {'name': section_name, 'grade_id': grade_id}
+    return {'name': section_name, 'department_id': department_id}
+
+
+def get_available_section_capacity(section_id, exclude_student_id=None):
+    section = StudentSection.query.get_or_404(section_id)
+    enrolled_count = len([
+        student for student in section.students
+        if exclude_student_id is None or student.id != exclude_student_id
+    ])
+    return section, enrolled_count
+
 def find_or_create_section(section_name, department_id=None, grade_id=None):
     """Seamlessly find or create section - the best in the world!"""
     print(f"Looking for section: '{section_name}' in department_id: {department_id}, grade_id: {grade_id}")
     
     # Find existing section with available capacity
-    if g.app_mode == 'school':
-        existing_section = StudentSection.query.filter_by(
-            name=section_name, 
-            grade_id=grade_id
-        ).first()
-    else:  # college
-        existing_section = StudentSection.query.filter_by(
-            name=section_name, 
-            department_id=department_id
-        ).first()
+    existing_section = StudentSection.query.filter_by(
+        **get_section_query_filters(section_name, department_id=department_id, grade_id=grade_id)
+    ).first()
     
     if existing_section:
         current_students = len(existing_section.students)
@@ -35,9 +43,12 @@ def find_or_create_section(section_name, department_id=None, grade_id=None):
             return existing_section
         else:
             # Section is full, create a new one with incremental naming
-            section_count = StudentSection.query.filter(
-                StudentSection.name.like(f"{section_name}%")
-            ).count()
+            scoped_sections = StudentSection.query.filter(StudentSection.name.like(f"{section_name}%"))
+            if g.app_mode == 'school':
+                scoped_sections = scoped_sections.filter_by(grade_id=grade_id)
+            else:
+                scoped_sections = scoped_sections.filter_by(department_id=department_id)
+            section_count = scoped_sections.count()
             new_section_name = f"{section_name} - {section_count + 1}"
             print(f"Section full, creating new section: '{new_section_name}'")
             
@@ -143,6 +154,9 @@ def handle_sections(section_id=None):
         else: # PUT or DELETE
             section = StudentSection.query.get_or_404(section_id)
             if request.method == 'PUT':
+                enrolled_count = len(section.students)
+                if int(data['capacity']) < enrolled_count:
+                    return jsonify({"message": f"Capacity cannot be lower than current enrolled students ({enrolled_count})."}), 400
                 section.name = data['name']
                 section.capacity = data['capacity']
                 message = f"{'Section' if g.app_mode == 'school' else 'Batch'} updated."
@@ -187,6 +201,10 @@ def handle_students(student_id=None):
             if User.query.filter_by(username=data['username']).first(): return jsonify({"message": "Username already exists."}), 409
             if data.get('email') and User.query.filter_by(email=data['email']).first(): return jsonify({"message": "Email already exists."}), 409
 
+            section, enrolled_count = get_available_section_capacity(data['section_id'])
+            if enrolled_count >= section.capacity:
+                return jsonify({"message": f"{'Section' if g.app_mode == 'school' else 'Batch'} '{section.name}' is full ({enrolled_count}/{section.capacity})."}), 400
+
             new_user = User(username=data['username'], email=data.get('email'), password=hash_password(password), role='student')
             db.session.add(new_user)
             db.session.flush()
@@ -224,6 +242,10 @@ def handle_students(student_id=None):
             if request.method == 'PUT':
                 if user.username != data['username'] and User.query.filter_by(username=data['username']).first(): return jsonify({"message": "Username already exists."}), 409
                 if data.get('email') and user.email != data['email'] and User.query.filter_by(email=data['email']).first(): return jsonify({"message": "Email already exists."}), 409
+
+                target_section, enrolled_count = get_available_section_capacity(data['section_id'], exclude_student_id=student.id)
+                if enrolled_count >= target_section.capacity:
+                    return jsonify({"message": f"{'Section' if g.app_mode == 'school' else 'Batch'} '{target_section.name}' is full ({enrolled_count}/{target_section.capacity})."}), 400
                 
                 user.username, user.email = data['username'], data.get('email')
                 if data.get('password'): user.password = hash_password(data['password'])

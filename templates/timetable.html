@@ -721,7 +721,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function exportTimetable() {
         showToast('Exporting timetable...', 'info');
-        window.location.href = '/api/export_timetable';
+        const params = new URLSearchParams();
+
+        if (semesterSelect.value) params.set('semester', semesterSelect.value);
+        if (departmentSelect.value) params.set('department', departmentSelect.value);
+        if (sectionSelect.value) params.set('section', sectionSelect.value);
+
+        const queryString = params.toString();
+        window.location.href = queryString ? `/api/export_timetable?${queryString}` : '/api/export_timetable';
     }
 
     async function clearTimetable() {

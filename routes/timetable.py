@@ -373,9 +373,14 @@ def export_timetable():
         return jsonify({'error': 'Unauthorized'}), 401
 
     try:
+        semester_filter = request.args.get('semester', type=str)
+        department_filter = request.args.get('department', type=str)
+        section_filter = request.args.get('section', type=str)
+
         entries = TimetableEntry.query.options(
             joinedload(TimetableEntry.teacher),
-            joinedload(TimetableEntry.section),
+            joinedload(TimetableEntry.section).joinedload(StudentSection.department).joinedload(Department.semester),
+            joinedload(TimetableEntry.section).joinedload(StudentSection.grade),
             joinedload(TimetableEntry.classroom),
             joinedload(TimetableEntry.subject),
             joinedload(TimetableEntry.course)
@@ -403,6 +408,14 @@ def export_timetable():
                 semester_name = entry.section.grade.name
 
             section_name = entry.section.name if entry.section else "Unknown"
+
+            if semester_filter and semester_name != semester_filter:
+                continue
+            if department_filter and department_name != department_filter:
+                continue
+            if section_filter and section_name != section_filter:
+                continue
+
             key = (semester_name, department_name, section_name)
             section_groups.setdefault(key, []).append(entry)
 
@@ -415,7 +428,16 @@ def export_timetable():
 
         response = make_response(pdf_bytes)
         response.headers['Content-Type'] = 'application/pdf'
-        response.headers['Content-Disposition'] = 'attachment; filename=timetable.pdf'
+        filename_parts = ['timetable']
+        if semester_filter:
+            filename_parts.append(semester_filter.replace(' ', '_'))
+        if department_filter:
+            filename_parts.append(department_filter.replace(' ', '_'))
+        if section_filter:
+            filename_parts.append(section_filter.replace(' ', '_'))
+        filename = "_".join(filename_parts) + '.pdf'
+
+        response.headers['Content-Disposition'] = f'attachment; filename={filename}'
 
         return response
     
