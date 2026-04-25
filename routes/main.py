@@ -218,7 +218,8 @@ def generate_fake_data():
             yield log_line(f"🔥 ERROR: {e}")
             yield event("error", message=str(e))
 
-        current_app.config['FAKE_DATA_RUNNING'] = False
+        finally:
+            current_app.config['FAKE_DATA_RUNNING'] = False
 
     return Response(generate(), mimetype='text/event-stream')
 

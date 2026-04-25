@@ -16,14 +16,14 @@ from sqlalchemy import text
 fake = Faker()
 
 
-def get_or_create_student_section(base_name, department, grade, sections, capacity=30):
+def get_or_create_student_section(base_name, department, grade, sections, section_counts, capacity=30):
     matching_sections = [
         section for section in sections
         if section.department_id == department.id and section.name.startswith(base_name)
     ]
 
     for section in matching_sections:
-        if len(section.students) < section.capacity:
+        if section_counts.get(section, 0) < section.capacity:
             return section
 
     suffix = "" if not matching_sections else f" - {len(matching_sections) + 1}"
@@ -36,6 +36,7 @@ def get_or_create_student_section(base_name, department, grade, sections, capaci
     db.session.add(new_section)
     db.session.flush()
     sections.append(new_section)
+    section_counts[new_section] = 0
     return new_section
 
 def clear_database():
@@ -259,6 +260,7 @@ def create_realistic_data():
             sections.append(section)
     
     db.session.flush()
+    section_counts = {section: 0 for section in sections}
     
     # Create classrooms
     classrooms = []
@@ -322,7 +324,7 @@ def create_realistic_data():
             db.session.execute(text(
                 "INSERT INTO teacher_college_courses (teacher_id, course_id) VALUES (:teacher_id, :course_id)"
             ), {"teacher_id": teacher_id, "course_id": course_id})
-        db.session.commit()
+        db.session.flush()
         print("✅ Teacher-course assignments completed!")
     
     # Create students beyond the initial section capacity so overflow sections are generated.
@@ -338,7 +340,13 @@ def create_realistic_data():
         department = random.choice(departments)
         base_section_name = random.choice(section_labels)
         grade = grades[i % len(grades)]
-        section = get_or_create_student_section(base_section_name, department, grade, sections)
+        section = get_or_create_student_section(
+            base_section_name,
+            department,
+            grade,
+            sections,
+            section_counts
+        )
         student = Student(
             user=user,
             full_name=fake.name(),
@@ -346,6 +354,7 @@ def create_realistic_data():
         )
         db.session.add_all([user, student])
         students.append(student)
+        section_counts[section] = section_counts.get(section, 0) + 1
     
     db.session.flush()
 
