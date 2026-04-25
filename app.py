@@ -78,9 +78,9 @@ def create_app(config_class=Config):
     def inject_global_vars():
         try:
             config = AppConfig.query.filter_by(key='institute_name').first()
-            return {'institute_name': config.value if config else 'Scheduler AI'}
+            return {'institute_name': config.value if config else 'Scheduler'}
         except Exception:
-            return {'institute_name': 'Scheduler AI'}
+            return {'institute_name': 'Scheduler'}
 
     # OPTIONAL: Metrics safe execution
     with app.app_context():
