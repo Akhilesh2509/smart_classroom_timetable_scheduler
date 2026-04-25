@@ -1,170 +1,223 @@
-## 💙 Smart Classroom & Timetable Scheduler
+# 💙 Smart Classroom & Timetable Scheduler  
 
-## 🎓 Smart Classroom & Timetable Scheduler</span>
-A smart scheduling and classroom automation system built for Ajeenkya DY Patil University, Pune, India
+## Overview  
+A **Smart Classroom & Timetable Scheduler** designed for Ajeenkya DY Patil University, Pune, India.  
 
-Developed by Team:
+This system automates **timetable generation, classroom allocation, and academic resource management** using intelligent scheduling techniques. It ensures **conflict-free, optimized, and efficient timetable creation** for both school and college environments.
 
---- Aditya Singh
+---
 
---- Akhilesh Bajaj
+## Developed By  
+- Aditya Singh  
+- Akhilesh Bajaj  
+- Kunal Khandepekar  
 
---- Kunal Khandepekar
+---
 
-## 🌟 Key Features
-### 🧠 Intelligent Scheduling System
+## Key Features  
 
-Uses a hybrid approach that combines smart planning, constraint validation, and backtracking mechanisms
-Calculates timetable accuracy and technique efficiency dynamically
-Detects and avoids lecture conflicts automatically
-Supports both school structure and college semester–department structure
-Reassigns alternative teacher and classroom options when required
+### Intelligent Scheduling Engine  
+- Hybrid scheduling using **constraint validation + backtracking + optimization logic**  
+- Automatically detects and resolves **lecture conflicts**  
+- Dynamically calculates **accuracy & efficiency**  
+- Supports **school structure & college semester system**  
+- Suggests **alternate teachers and classrooms** when conflicts arise  
 
-## 📊 Real-Time Dashboard Analytics
+---
 
-Displays live insights on:
-Total students
-Teacher and subject mapping
-Classrooms availability
-Lectures scheduled per section
-Accuracy percentage
-Performance duration
-Provides smooth activity updates without overwhelming animations
+### Real-Time Dashboard Analytics  
+- Displays live insights:
+  - Total students  
+  - Teacher–subject mapping  
+  - Classroom availability  
+  - Lectures per section  
+  - Accuracy %  
+  - Performance time  
+- Smooth UI updates without heavy animations  
 
-## 👥 Academic Resource Management
+---
 
-User Access:
-Admin gets full control, students get only timetable access
-Secure account authentication
-Batch-wise student section grouping
-Teacher subject assignment panel
-Classroom capacity tracking
-Subjects and courses management
-Exam scheduling interface
+### Academic Resource Management  
+- **Role-Based Access Control**  
+  - Admin → Full control  
+  - Student → View-only timetable  
 
-## ♿ Accessibility Support
+- Features:
+  - Secure authentication  
+  - Batch & section management  
+  - Teacher–subject assignment  
+  - Classroom capacity tracking  
+  - Course & subject management  
+  - Exam scheduling  
 
-High contrast mode
-Reader-friendly fonts
-Voice-based navigation support
-Keyboard-only interface usability
-Controlled motion effects for better readability
+---
 
-## 🎨 UI Design Structure
+### Accessibility Support  
+- High contrast mode  
+- Reader-friendly fonts  
+- Voice-based navigation  
+- Keyboard-only usability  
+- Reduced motion interface  
 
-Dark theme interface
-Professional glass-style panels
-Fully responsive layout for laptops and desktops used in college presentations
-Simplified student view interface
-Dashboard sections like Recent Activity and Quick Actions visible only in admin login
-Section Timetables panel hidden for students and also hidden for admin home view unless accessed separately
+---
 
-## 🏗 System Overview
-### Backend Includes
+### UI/UX Design  
+- Modern **dark theme interface**  
+- Glass-style dashboard panels  
+- Fully responsive (optimized for laptops & presentations)  
+- Simplified student view  
+- Admin-only dashboard sections:
+  - Recent Activity  
+  - Quick Actions  
 
-Application entry point
-Data models for users, teachers, classrooms, semesters, departments, sections, and timetable entries
-Scheduling utilities
-API routing for timetable generation and resource handling
+---
 
-### Frontend Includes
+## System Architecture  
 
-A base dashboard layout
-Student timetable view
-Admin scheduling panel
-Users, subjects, classrooms, batches and exam management pages
-Initial setup UI wizard
+### Backend  
+- Application entry point  
+- Data models:
+  - Users, Teachers, Students  
+  - Classrooms, Departments, Semesters  
+  - Sections & Timetable entries  
+- Scheduling engine logic  
+- REST APIs for:
+  - Timetable generation  
+  - Resource management  
 
-## Core Database Entities
+---
 
-User: login role and access
-Teacher: faculty details and subject allocation
-Student: batch and section mapping
-Section: lecture division
-Classroom: room capacity and availability
-Timetable Entry: lecture schedule with subjects, teacher, and room mapping
-Activity Logs and Metrics: system performance and activity tracking
+### Frontend  
+- Dashboard layout  
+- Admin control panel  
+- Student timetable view  
+- Management modules:
+  - Users  
+  - Subjects  
+  - Classrooms  
+  - Exams  
+- Initial setup wizard  
 
-## ⚙ Project Configuration
-### Timetable Parameters
+---
 
-Working days setup
-Period durations
-Break slots management
-Max lectures per day per section
-Teacher and classroom availability validation
+## Core Database Entities  
+- **User** → Authentication & roles  
+- **Teacher** → Faculty + subject allocation  
+- **Student** → Batch & section mapping  
+- **Section** → Lecture grouping  
+- **Classroom** → Capacity & availability  
+- **Timetable Entry** → Subject + teacher + room mapping  
+- **Activity Logs** → Performance tracking  
 
-### Algorithm Tuning
+---
 
-Schedule population size adapts based on number of sections
-Generations, mutation, and crossover parameters adjust automatically
+## Configuration  
 
-### Accessibility Controls
+### Timetable Parameters  
+- Working days  
+- Lecture duration  
+- Break slots  
+- Max lectures per day  
+- Teacher & classroom availability  
 
-UI contrast
-Motion strength
-Navigation mode
+---
 
-## 🛠 API Functions
-### User Login & Session
+### Algorithm Optimization  
+- Adaptive schedule population  
+- Auto-adjust:
+  - Generations  
+  - Mutation rate  
+  - Crossover logic  
 
-Login authentication
-Logout
-Role-based session access
+---
 
-### Scheduling & Performance
+### Accessibility Controls  
+- UI contrast settings  
+- Motion control  
+- Navigation preferences  
 
-Timetable generation call
-Retrieve timetable data
-Dashboard statistics fetch
-Teachers, sections, classrooms, subjects, exams API routing
+---
 
-## 🔒 System Security
+## API Modules  
 
-Encrypted password storage
-Secure session handling
-Input validation
-Parameterized database queries
+### Authentication  
+- Login / Logout  
+- Role-based session access  
 
-## 🎯 Timetable Generation Guide
+### Scheduling  
+- Generate timetable  
+- Fetch timetable data  
+- Dashboard analytics  
 
-Login as Admin
-Open Timetable page
-Generate Timetable
-System processes sections
-Accuracy and performance measured and stored
-Timetables mapped with subject, teacher and classroom
-Display updates automatically on dashboard
-Students view only timetable, not generation panel
+### Resource APIs  
+- Teachers  
+- Sections  
+- Subjects  
+- Classrooms  
+- Exams  
 
-## 🧪 Testing Flow
+---
 
-Run database initializer
-Generate timetable
-Observe dashboard updates
-Ensure no conflicts and good accuracy
-Validate resource usage statistics
+## Security  
+- Encrypted password storage  
+- Secure session handling  
+- Input validation  
+- Parameterized queries (SQL injection prevention)  
 
-## 🐛 Common Issues & Fix Areas
+---
 
-Database connection → ensure DB is running and credentials are correct
-Timetable not generating → ensure subject-teacher mapping exists
-Classroom empty → ensure classroom data is added
-Dashboard blank → check if API response is reaching UI properly
-Login not redirecting → ensure session role is passed correctly
+## How It Works  
 
-## 🤝 Team Contribution Summary
-Team Member Names --- Major Focus
-Aditya Singh -------- UI integration + student login view + dashboard layout
-Akhilesh Bajaj ------ Database design + semester & subject structure
-Kunal Khandepekar --- Lecture scheduling and constraint mapping
+1. Admin logs into the system  
+2. Navigates to **Timetable Generation**  
+3. System processes all sections  
+4. Applies scheduling algorithm  
+5. Generates **conflict-free timetable**  
+6. Stores accuracy & performance metrics  
+7. Updates dashboard automatically  
+8. Students can only **view final timetable**  
 
-## Collaborative Work Done Together:
+---
 
-System planning
-Feature integration
-UI organization
-Data testing
-Conflict validation
+## Testing Workflow  
+- Initialize database  
+- Add resources (teachers, classrooms, subjects)  
+- Generate timetable  
+- Validate:
+  - No conflicts  
+  - Proper allocation  
+  - Performance metrics  
 
-### ❤️ Made with teamwork at Ajeenkya DY Patil University
+---
+
+## Common Issues & Fixes  
+
+- **Database error** → Check DB connection & credentials  
+- **Timetable not generating** → Ensure teacher–subject mapping exists  
+- **Empty classrooms** → Add classroom data  
+- **Dashboard blank** → Verify API response  
+- **Login issue** → Check session role handling  
+
+---
+
+## Team Contributions  
+
+| Member            | Contribution                                  |
+|-------------------|-----------------------------------------------|
+| Aditya Singh      | Database design, semester & subject structure |
+| Akhilesh Bajaj    | Scheduling logic & constraints                |
+| Kunal Khandepekar | UI integration, student view, dashboard       |
+
+### Collaborative Work  
+- System design  
+- Feature integration  
+- UI structuring  
+- Testing & validation  
+- Conflict resolution  
+
+---
+
+## Conclusion  
+A complete **end-to-end smart scheduling solution** that improves efficiency, reduces manual effort, and ensures optimal academic resource utilization.
+
+---
