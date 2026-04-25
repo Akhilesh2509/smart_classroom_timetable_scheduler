@@ -439,7 +439,7 @@ Admin Dashboard
             document.getElementById('total_teachers').innerText = data.total_teachers;
             document.getElementById('total_classrooms').innerText = data.total_classrooms;
             document.getElementById('avg_load').innerText = data.avg_teacher_load;
-            document.getElementById('response_time').innerText = data.response_time;
+            document.getElementById('response_time').innerText = `${data.response_time} sec`;
             document.getElementById('conflicts').innerText = data.conflicts;
 
             const chartData = [
